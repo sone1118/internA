@@ -1,0 +1,11 @@
+logging:
+  level:
+    root: info
+
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://10.50.103.62:3306/db_InternA?characterEncoding=UTF-8&serverTimezone=UTC
+    username: interna
+    password: test1234$
+
