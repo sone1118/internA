@@ -11,13 +11,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.contentree.interna.global.auth.CustomAccessDeniedHandler;
 import com.contentree.interna.global.auth.CustomAuthenticationEntryPoint;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 	
-	private CustomAccessDeniedHandler customAccessDeniedHandler;
-	private CustomAuthenticationEntryPoint customAuthenticationEntryPoint; 
-
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint; 
+	
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring().antMatchers("/v2/api-docs", "/swagger*/**");
