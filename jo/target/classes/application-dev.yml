@@ -8,4 +8,7 @@ spring:
     url: jdbc:mariadb://10.50.103.62:3306/db_InternA?characterEncoding=UTF-8&serverTimezone=UTC
     username: interna
     password: test1234$
-
+  security:
+    user:
+      name: interna
+      password: interna123!

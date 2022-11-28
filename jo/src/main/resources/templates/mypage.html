@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout}">
+		<th:block layout:fragment="content">
+			<div id="content1">
+				<div>
+					<img 
+					id="user_logo" 
+					th:src="@{/images/user_logo.png}" 
+					alt="user_logo!"/>						  
+				</div>
+				<div>
+					<h2>회원정보</h2>
+				</div>
+				<div id="user_info">
+					<div>
+						<span>이름</span><span th:text="${userName}"></span>
+					</div>
+					
+					<div>
+						<span>이메일</span><span th:text="${userEmail}"></span>
+					</div>
+					
+					<div>
+						<span>생년월일</span><span th:text="${userYear} + '.' + ${userMonth} + '.' + ${userDate}"></span>
+					</div>
+					
+					<div>
+						<span>가입일</span><span th:text="${userCreateAtYear} + '.' + ${userCreateAtMonth} + '.' + ${userCreateAtDate}"></span>
+					</div>
+					<div>
+						<span>회원등급</span><span th:text="${userGrade}"></span>
+					</div>	
+				</div>
+			</div>
+			<hr>
+			<div id="joins_check">
+			<span>회원 탈퇴</span>
+			<a href="#">중앙그룹 임직원이신가요?</a>
+			</div>
+			<br>
+		</th:block>
+</html>

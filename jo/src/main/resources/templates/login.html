@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout}">
+		<th:block layout:fragment="content">
+			<div th:if="${!login}" id="content1">
+				<div id="error_message" th:text="${error_message}"></div>
+				<div>
+					<h1>중앙 통합 로그인</h1>
+				</div>
+				<div>
+					<img 
+					id="jo_logo" 
+					th:src="@{/images/joins_logo.png}" 
+					alt="jo_logo1!"/>		
+				</div>
+				<div>
+					<button id="login_button">
+					<img 
+						id="kakao_logo" 
+						th:src="@{/images/kakao_logo.png}" 
+						alt="kakao_logo"/> 카카오 로그인
+					</button>	
+				</div>
+			</div>			
+			<div th:if="${login}" id="content2">
+				<div >
+					<img 
+					id="user_logo" 
+					th:src="@{/images/user_logo.png}" 
+					alt="user_logo!"/>		
+					<img 
+					th:if="${birth}"
+					id="gift_logo" 
+					th:src="@{/images/gift_logo.png}" 
+					alt="gift_logo!"/>					  
+				</div>
+				<div>
+					<span th:text=${level} id="level" class="circle">G</span>
+					<span th:if="${joins}" id="joins" class="circle">J</span>
+					<span>[[${name}]]님 환영합니다~</span>
+				</div>
+				<div class="black_bg"></div>
+				<div class="modal_wrap">
+					<div class="modal_close">X</div>
+					<div class="modal_contents"></div>
+				</div>
+			</div>
+		</th:block>
+		
+</html>

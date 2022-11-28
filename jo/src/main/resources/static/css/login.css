@@ -1,0 +1,177 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Poppins", sans-serif;
+}
+html, body{
+	height: 100;
+	width: 100;
+	padding: 10px;
+}
+h1 {
+	font-size: 2.8rem;
+}
+#header {
+    width: 100%;
+    height: 5vh;
+    padding: 20px 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#header #jo_logo {
+	position: relative;
+	max-width: 80px;
+}
+
+#header ul {
+    position: relative;
+    display: flex;
+}
+
+#header ul li {
+	margin-left: 20px;
+    list-style: none;
+}
+
+#header ul li a {
+    display: inline-block;
+    color: #666;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+#error_message {
+	text-align: center;
+	color: tomato;
+	font-weight: 700;
+}
+#content1, #content2{
+	width: 100;
+	height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#user_info {
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: left;
+}
+#user_info div {
+	width: 400px;
+	text-align: left;
+	display: flex;
+	justify-content: space-between;
+}
+#content1 div, #content2 div {
+	padding-top: 20px;
+}
+#content1 #user_logo {
+	width: 150px;
+}
+#joins_check {
+	display: flex;
+	justify-content: space-between;
+}
+#content2 #user_logo {
+	width: 180px;
+}
+#content2 span {
+	font-size: 1.7rem;
+	font-weight: 600;
+}
+#content2 .circle {
+	display: inline-block;
+	border-radius: 50%;
+	height: 2rem;
+	width: 2rem;
+	font-size: 1.4rem;
+	text-align: center;
+	cursor: pointer;
+}
+#content2 #joins{
+	background-color: red;
+	color: white;
+}
+#content2 #level{
+	background-color: blue;
+	color: white;
+}
+#content2 #level:hover, #joins:hover, #gift_logo:hover{
+	opacity: 0.5;
+}
+
+#content2 #gift_logo {
+	width: 50px;
+	cursor: pointer;
+}
+
+#login_button {
+	margin: 0;
+	height: 60px;
+	width: 400px;
+	background-color: #f9e000;
+	position: relative;
+	display: inline-block;
+	border: none;
+	border-radius: 15px;
+	text-decoration: none;
+	color: white;
+	font-weight: 600;
+	font-size: 1.3rem;
+}
+
+#login_button #kakao_logo {
+	width: 1.3rem;
+}
+#login_button:hover {
+	cursor: pointer;
+	filter: brightness(0.95);
+}
+.black_bg {
+	display: none;
+	width: 700px;
+	height: 500px;
+	position: absolute;
+	opacity: 0.3;
+	background: #000;
+	z-index: 2;
+}
+.modal_wrap {
+	display: none;
+	width: 650px;
+	height: 450px;
+	position: absolute;
+	opacity: 0.9;
+	background: #fff;
+	z-index: 3;
+
+}
+.modal_contents {
+	padding: 30px;
+}
+.modal_close {
+	position: absolute;
+	right: -18px;
+	top:-58px;
+	font-size: 1.5rem;
+	cursor: pointer;
+}
+
+#footer {
+	width: 100;
+	height: 5vh;
+	display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#footer .logos {
+	width: 100px;
+	margin: 50px;
+}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<th:block th:fragment="header">
+		<div th:if="${login}" id="header">
+			<img 
+			id="jo_logo" 
+			th:src="@{/images/joins_logo.png}" 
+			alt="jo_logo1!"/>
+			<ul>
+				<li><a th:href="@{/logout}">로그아웃</a></li>
+				<li><a th:href="@{/mypage}">마이페이지</a></li>
+			</ul>
+		</div>
+	</th:block>
+</html>
