@@ -1,18 +1,17 @@
 package com.contentree.interna.global.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "기본 반환 값", description = "Base Response")
+@Schema(description = "Base Response body")
 public class BaseResponseBody {
-	@ApiModelProperty(value = "응답 코드", example = "200")
+	@Schema(description = "응답 코드", example = "200")
 	Integer statusCode = null;
 	
-	@ApiModelProperty(value = "응답 메시지", example = "정상")
+	@Schema(description = "응답 메시지", example = "정상")
 	String message = null;
 	
 	public BaseResponseBody() {}

@@ -29,7 +29,7 @@ public class SwaggerConfig {
         		.securitySchemes(Arrays.asList(apiKey("JWT_Access Token", "Authorization", "header")))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.contentree.interna"))
-                .paths(PathSelectors.ant("/api/**"))
+                .paths(PathSelectors.any())
                 .build().apiInfo(apiInfo());
 
     }
