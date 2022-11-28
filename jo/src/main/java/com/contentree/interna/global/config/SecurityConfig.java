@@ -9,12 +9,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.contentree.interna.global.auth.CustomAccessDeniedHandler;
+import com.contentree.interna.global.auth.CustomAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 	
 	private CustomAccessDeniedHandler customAccessDeniedHandler;
+	private CustomAuthenticationEntryPoint customAuthenticationEntryPoint; 
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -27,6 +29,8 @@ public class SecurityConfig {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 토큰 기반 인증이므로 세션 사용 하지않음
 			.and()
 			.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler) // 액세스 할 수 없는 요청 했을 시 동작
+			.and()
+			.httpBasic().authenticationEntryPoint(customAuthenticationEntryPoint)   // 인증 되지 않은 유저가 요청했을때 동작
 			.and()
 			.authorizeRequests()
 			.antMatchers("/hello/**").permitAll()
