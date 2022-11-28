@@ -8,9 +8,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.contentree.interna.global.auth.CustomAccessDeniedHandler;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	private CustomAccessDeniedHandler customAccessDeniedHandler;
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -21,6 +25,8 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()	// csrf 미적용
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 토큰 기반 인증이므로 세션 사용 하지않음
+			.and()
+			.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler) // 액세스 할 수 없는 요청 했을 시 동작
 			.and()
 			.authorizeRequests()
 			.antMatchers("/hello/**").permitAll()
