@@ -27,8 +27,8 @@ public class JwtTokenUtil {
     private final Integer accessTokenExpiration;
     private final Integer refreshTokenExpiration;
 
-    public static final String TOKEN_PREFIX = "Bearer ";
-    public static final String HEADER_STRING = "Authorization";
+    public final String TOKEN_PREFIX = "Bearer ";
+    public final String HEADER_STRING = "Authorization";
 
     @Autowired
     public JwtTokenUtil(@Value("${spring.security.jwt.secret}") String secretKey,
@@ -83,13 +83,13 @@ public class JwtTokenUtil {
     public Long getUserSeq(String token) {
         return extractAllClaims(token).get("userSeq", Long.class);
     }
-
+    
     // 토큰 만료 날짜 가져오기
     public static Date getTokenExpiration(Integer expirationTime) {
         Date now = new Date();
         return new Date(now.getTime() + expirationTime);
     }
-
+    
     // 토큰 만료 시간 가져오기
     public Long getTokenExpirationAsLong(String token) {
         // 남은 유효시간
