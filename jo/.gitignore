@@ -11,6 +11,7 @@ application-dev.yml
 .springBeans
 .sts4-cache
 
+<<<<<<< HEAD
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -24,3 +25,17 @@ application-dev.yml
 /dist/
 /nbdist/
 /.nb-gradle/
+=======
+### Eclipse ###
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+>>>>>>> 62d06d297953409eeb579d498a2e954ed624e146

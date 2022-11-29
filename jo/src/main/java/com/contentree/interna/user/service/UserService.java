@@ -1,13 +1,16 @@
 package com.contentree.interna.user.service;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -17,27 +20,36 @@ import com.contentree.interna.user.entity.Grade;
 import com.contentree.interna.user.entity.KakaoProfile;
 import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
+import com.contentree.interna.user.oauth2.KakaoOAuth2;
 import com.contentree.interna.user.oauth2.OauthToken;
 import com.contentree.interna.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.Algorithm;
+import com.nimbusds.jwt.JWT;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-
+	private final PasswordEncoder passwordEncoder;
+	private final UserRepository userRepository;
+	private final KakaoOAuth2 kakaoOAuth2;
+	private final AuthenticationManager authenticationManager;
 	public static final String FRONT_URL = "http://localhost:8080";
 
-	@Autowired
-	UserRepository userRepository;
+//	@Autowired
+//	UserRepository userRepository;
 
 	// 환경 변수 가져오기
-	@Value("${kakao.clientId}")
+	@Value("${spring.security.client.registration.kakao.client-id}")
 	String client_id;
 
-	@Value("${kakao.secret}")
+	@Value("${spring.security.client.registration.kakao.client-secret}")
 	String client_secret;
 
-	public OauthToken getAccessToken(String code) {
+	public OauthToken getAccessToken(String code) throws IOException {
 
 		// POST 방식으로 key=value 데이터 요청
 		RestTemplate rt = new RestTemplate();
@@ -73,7 +85,7 @@ public class UserService {
 		return oauthToken;
 	}
 
-	public KakaoProfile findProfile(String token) {
+	public KakaoProfile findProfile(String token) throws IOException {
 		// POST 방식으로 key=value 데이터 요청
 		RestTemplate rt = new RestTemplate();
 
@@ -128,15 +140,14 @@ public class UserService {
 		return createToken(user);
 	}
 
-//	public String createToken(User user) {
-//		// Jwt 생성 후 헤더에 추가해서 보내줌
-//		String jwtToken = JWT.create().withSubject(user.getKakaoEmail())
-//				.withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-//				.withClaim("id", user.getUserCode()).withClaim("nickname", user.getKakaoNickname())
-//				.sign(Algorithm.HMAC512(JwtRequestFilter.SECRET));
-//		
-//
-//		return jwtToken;
-//	}
+	public String createToken(User user) {
+		// Jwt 생성 후 헤더에 추가해서 보내줌
+		String jwtToken = JWT.create().withSubject(user.getKakaoEmail())
+				.withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+				.withClaim("id", user.getUserCode()).withClaim("nickname", user.getKakaoNickname())
+				.sign(Algorithm.HMAC512(JwtRequestFilter.SECRET));
+
+		return jwtToken;
+	}
 
 }

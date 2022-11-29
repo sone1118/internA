@@ -3,11 +3,12 @@ package com.contentree.interna;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-// Spring Boot 2.x
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-//@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class JoApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
@@ -20,5 +21,15 @@ public class JoApplication extends SpringBootServletInitializer {
 	}
 
 	private static Class<JoApplication> applicationClass = JoApplication.class;
+}
 
+@RestController
+class HelloController {
+
+	@RequestMapping("/hello/{name}")
+	String hello(@PathVariable String name) {
+
+		return "Hi " + name + " !";
+
+	}
 }
