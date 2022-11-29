@@ -11,7 +11,6 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.AuthorizationScope;
 import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
@@ -25,8 +24,8 @@ public class SwaggerConfig {
     @Bean
     public Docket api(){
         return new Docket(DocumentationType.SWAGGER_2)
+        		.useDefaultResponseMessages(false)
         		.securityContexts(Arrays.asList(securityContext()))
-        		.securitySchemes(Arrays.asList(apiKey("JWT_Access Token", "Authorization", "header")))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.contentree.interna"))
                 .paths(PathSelectors.any())
@@ -55,9 +54,4 @@ public class SwaggerConfig {
         authorizationScopes[0] = authorizationScope;
         return Arrays.asList(new SecurityReference("Authorization", authorizationScopes), new SecurityReference("Refresh", authorizationScopes));
     }
-    
-    private ApiKey apiKey(String name, String keyName, String passAs) {
-        return new ApiKey(name, keyName, passAs);
-    }
-
 }
