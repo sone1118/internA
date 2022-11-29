@@ -12,7 +12,7 @@ html, body{
 h1 {
 	font-size: 2.8rem;
 }
-#header {
+.header {
     width: 100%;
     height: 5vh;
     padding: 20px 70px;
@@ -21,22 +21,23 @@ h1 {
     align-items: center;
 }
 
-#header #jo_logo {
+.header #jo_logo {
 	position: relative;
 	max-width: 80px;
 }
 
-#header ul {
+.header ul {
     position: relative;
     display: flex;
 }
 
-#header ul li {
+.header ul li {
 	margin-left: 20px;
     list-style: none;
 }
 
-#header ul li a {
+.header ul li a {
+	cursor: pointer;
     display: inline-block;
     color: #666;
     font-size: 1.1rem;
@@ -48,10 +49,10 @@ h1 {
 	color: tomato;
 	font-weight: 700;
 }
-#content1, #content2{
+.content1, .content2, .content3{
 	width: 100;
 	height: 80vh;
-    display: flex;
+	display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -69,25 +70,30 @@ h1 {
 	display: flex;
 	justify-content: space-between;
 }
-#content1 div, #content2 div {
+.content1 div, .content2 div, .content3 div {
 	padding-top: 20px;
 }
-#content1 #user_logo {
+.content1 #user_logo, .content3 #user_logo {
 	width: 150px;
 }
 #joins_check {
 	display: flex;
 	justify-content: space-between;
 }
-#content2 #user_logo {
+.content2 #user_logo {
 	width: 180px;
 }
-#content2 span {
-	font-size: 1.7rem;
+.content2 #level_joins_name {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.content2 span {
+	margin: 0px 5px;
+	font-size: 1.5rem;
 	font-weight: 600;
 }
-#content2 .circle {
-	display: inline-block;
+.circle {
 	border-radius: 50%;
 	height: 2rem;
 	width: 2rem;
@@ -95,21 +101,33 @@ h1 {
 	text-align: center;
 	cursor: pointer;
 }
-#content2 #joins{
+.content2 #joins{
 	background-color: red;
 	color: white;
 }
-#content2 #level{
+.content2 #level{
 	background-color: blue;
 	color: white;
 }
-#content2 #level:hover, #joins:hover, #gift_logo:hover{
+.content2 #level:hover, #joins:hover, #gift_logo:hover{
 	opacity: 0.5;
 }
 
-#content2 #gift_logo {
+.content2 #gift_logo {
 	width: 50px;
 	cursor: pointer;
+}
+
+#phone {
+	margin-top: 20px;
+	padding: 0 10px;
+	height: 50px;
+	width: 100px;
+	border: none;
+	border-radius: 15px;
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 1rem;
 }
 
 #login_button {
@@ -159,7 +177,7 @@ h1 {
 .modal_close {
 	position: absolute;
 	right: -18px;
-	top:-58px;
+	top:-50px;
 	font-size: 1.5rem;
 	cursor: pointer;
 }
@@ -174,4 +192,8 @@ h1 {
 #footer .logos {
 	width: 100px;
 	margin: 50px;
+}
+
+.hidden {
+	display: none;
 }

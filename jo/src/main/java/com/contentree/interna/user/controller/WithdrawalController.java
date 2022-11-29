@@ -1,22 +1,19 @@
 package com.contentree.interna.user.controller;
 
-import java.util.Calendar;
-
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
-
-
 @RestController
-class MypageControllerController {
-	
-    @RequestMapping("/mypage")
-    public ModelAndView goMypage() {
-    	//유저 정보를 얻어온다
+public class WithdrawalController {
+
+    @RequestMapping("/withdrawal")
+    public ModelAndView home(@RequestParam(value = "error", required = false) String error) {
+
     	ModelAndView model = new ModelAndView();
-    	model.setViewName("mypage");
-  	
+    	model.setViewName("withdrawal");
+    	
     	return model;
     }
 }
