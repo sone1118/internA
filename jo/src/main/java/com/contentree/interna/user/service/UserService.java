@@ -9,40 +9,30 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.contentree.interna.global.util.JwtTokenUtil;
 import com.contentree.interna.user.entity.Grade;
 import com.contentree.interna.user.entity.KakaoProfile;
 import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
-import com.contentree.interna.user.oauth2.KakaoOAuth2;
 import com.contentree.interna.user.oauth2.OauthToken;
 import com.contentree.interna.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jwt.JWT;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
-	private final KakaoOAuth2 kakaoOAuth2;
-	private final AuthenticationManager authenticationManager;
 	public static final String FRONT_URL = "http://localhost:8080";
+	private final JwtTokenUtil jwtTokenUtil;
 
-//	@Autowired
-//	UserRepository userRepository;
-
-	// 환경 변수 가져오기
 	@Value("${spring.security.client.registration.kakao.client-id}")
 	String client_id;
 
@@ -106,6 +96,9 @@ public class UserService {
 		KakaoProfile kakaoProfile = null;
 		try {
 			kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoProfile.class);
+			System.out.println("=================================================");
+			System.out.println(kakaoProfileResponse.getBody());
+			System.out.println("=================================================");
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -121,7 +114,7 @@ public class UserService {
 		return user;
 	}
 
-	public String SaveUserAndGetToken(String token) {
+	public String SaveUserAndGetToken(String token) throws IOException {
 		KakaoProfile profile = findProfile(token);
 
 		User user = userRepository.findByUserEmail(profile.getKakao_account().getEmail());
@@ -130,24 +123,11 @@ public class UserService {
 					.userName("EXUSERNAME").userEmail(profile.getKakao_account().getEmail()).userPhone("01012345678")
 					.userKakaoId(profile.getId()).userRole(Role.JOINS).userGrade(Grade.BRONZE).userAgreeMarketing(true)
 					.userAgreeMarketing(true).build();
-//					.kakaoProfileImg(profile.getKakao_account().getProfile().getProfile_image_url())
-//					.kakaoNickname(profile.getKakao_account().getProfile().getNickname())
-//					.kakaoEmail(profile.getKakao_account().getEmail()).userRole("ROLE_USER").build();
 
 			userRepository.save(user);
 		}
 
-		return createToken(user);
-	}
-
-	public String createToken(User user) {
-		// Jwt 생성 후 헤더에 추가해서 보내줌
-		String jwtToken = JWT.create().withSubject(user.getKakaoEmail())
-				.withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-				.withClaim("id", user.getUserCode()).withClaim("nickname", user.getKakaoNickname())
-				.sign(Algorithm.HMAC512(JwtRequestFilter.SECRET));
-
-		return jwtToken;
+		return jwtTokenUtil.createAccessToken(user.getUserSeq());// access token
 	}
 
 }

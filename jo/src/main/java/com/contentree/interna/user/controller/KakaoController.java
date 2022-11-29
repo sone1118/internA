@@ -2,77 +2,51 @@ package com.contentree.interna.user.controller;
 
 import java.io.IOException;
 
-import javax.crypto.SecretKey;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.nimbusds.jose.shaded.json.JSONObject;
+import com.contentree.interna.user.entity.User;
+import com.contentree.interna.user.oauth2.OauthToken;
+import com.contentree.interna.user.service.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class KakaoController {
 
-	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-	private String restApiKey;
+	private final UserService userService;
 
-	/**
-	 * 인가코드 받기
-	 * 
-	 * @return 리다이렉트 url
-	 */
+	// 프론트에서 인가코드 돌려 받는 주소
+	// 인가 코드로 엑세스 토큰 발급 -> 사용자 정보 조회 -> DB 저장 -> jwt 토큰 발급 -> 프론트에 토큰 전달
+	@GetMapping("/oauth/token")
+	public ResponseEntity getLogin(@RequestParam("code") String code) throws IOException {
 
-	@GetMapping(value = "/kakao/oauth")
-	public String kakaoConnect() {
+		// 넘어온 인가 코드를 통해 access_token 발급
+		OauthToken oauthToken = userService.getAccessToken(code);
 
-		StringBuffer url = new StringBuffer();
-		url.append("https://kauth.kakao.com/oauth/authorize?");
-		url.append("client_id=" + restApiKey);
-		url.append("&redirect_uri=http://localhost:8080/kakao/callback");
-		url.append("&response_type=code");
+		// 발급 받은 accessToken 으로 카카오 회원 정보 DB 저장
+		String jwtToken = userService.SaveUserAndGetToken(oauthToken.getAccess_token());
 
-		return "redirect:/" + url.toString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + jwtToken);
+
+		return ResponseEntity.ok().headers(headers).body("success");
 	}
 
-	/**
-	 * 받은 인가 코드를 사용해서 API에 토큰 발급 요청 보내기
-	 * 
-	 * @param code
-	 * @param session
-	 * @throws IOException
-	 */
+	// jwt 토큰으로 유저정보 요청하기
+	@GetMapping("/me")
+	public ResponseEntity<Object> getCurrentUser(HttpServletRequest request) {
 
-	@RequestMapping(value = "/kakao/callback")
-	public void kakaoLogin(@RequestParam("code") String code, HttpSession session) throws IOException {
-		String accessTokenString = getKakaoAccessToken(code);
-		session.setAttribute("access_token", accessTokenString);// 로그아웃 할 때 사용됨
-	}
+		User user = userService.getUser(request);
 
-	/**
-	 * 
-	 * @param code
-	 * @return
-	 */
-
-	private String getKakaoAccessToken(String code) {
-		// 카카오에 보낼 api
-		WebClient webClient = WebClient.builder().baseUrl("https://kauth.kakao.com")
-				.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
-
-		// 카카오 서버에 요청 보내기 & 응답 받기
-		JSONObject response = webClient.post()
-				.uri(uriBuilder -> uriBuilder.path("/oauth/token").queryParam("grant_type", "authorization_code")
-						.queryParam("client_id", SecretKey.KAKAO_API_KEY)
-						.queryParam("redirect_uri", Kakao.DOMAIN_URI + "/api/kakao/callback").queryParam("code", code)
-						.build())
-				.retrieve().bodyToMono(JSONObject.class).block();
-
-		return (String) response.get("access_token");
+		return ResponseEntity.ok().body(user);
 	}
 }
