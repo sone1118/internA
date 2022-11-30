@@ -16,22 +16,22 @@
 				</div>
 				<div id="user_info">
 					<div>
-						<span>이름</span><span id="userName">userName</span>
+						<span>이름</span><span th:text="${userName}" id="userName">userName</span>
 					</div>
 					
 					<div>
-						<span>이메일</span><span id="userEmail">userEmail</span>
+						<span>이메일</span><span th:text="${userEmail}" id="userEmail">userEmail</span>
 					</div>
 					
 					<div>
-						<span>생년월일</span><span id="userBirth">birth</span>
+						<span>생년월일</span><span th:text="${userBirth}" id="userBirth">birth</span>
 					</div>
 					
 					<div>
-						<span>가입일</span><span id="userCreateAt">createAt</span>
+						<span>가입일</span><span th:text="${userCreateAt}" id="userCreateAt">createAt</span>
 					</div>
 					<div>
-						<span>회원등급</span><span id="userGrade">userGrade</span>
+						<span>회원등급</span><span th:text="${userGrade}" id="userGrade">userGrade</span>
 					</div>	
 				</div>
 			</div>
