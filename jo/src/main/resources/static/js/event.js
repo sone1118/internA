@@ -1,7 +1,8 @@
 const setCookie = function (name, value, expiredDay) {
     const expired = new Date();
+    //access 2시간 refresh 2주
     expired.setTime(expired.getTime() + expiredDay * 24 * 60 * 60 * 1000);
-
+	//expired.setTime(expired.getTime() + 2000);
     document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + expired.toUTCString() + ';path=/';
 };
 
@@ -13,6 +14,12 @@ const getCookie = function (name) {
 const deleteCookie = function (name) {
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
     
+}
+
+function onDelete() {
+	deleteCookie("refresh");
+	deleteCookie("access");
+	location.href = "http://localhost:8080/jo/";
 }
 
 function onClick(e) {

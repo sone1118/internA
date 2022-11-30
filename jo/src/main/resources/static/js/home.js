@@ -13,18 +13,25 @@ function loginClick() {
 					refresh: "1111asdf",
 				}
 				//쿠키에 값 저장		
-				setCookie('access', token.access, 1);
-				setCookie('refresh', token.refresh, 1);	  
+				setCookie('access', token.access, 0.08);
+				setCookie('refresh', token.refresh, 14);	
+				const error ="";  
 			})
 			.catch((error) => {
 				console.log("에러발생", error);
+				const error = "로그인에 실패 하셨습니다. 재로그인 해주세요."
 			});
 
 	   location.href = "http://localhost:8080/jo/";
 */
 	//임시로 값이 잘 들어 왔다고 넣어준 쿠키값
-	setCookie('access', "asdf1234", 1);
-	setCookie('refresh', "1111asdd", 1);
+	setCookie('access', "asdf1234", 0.08);
+	setCookie('refresh', "1111asdd", 14);
+	
+	//error 실험
+//	const error = "로그인에 실패했습니다."
+//	const url = `http://localhost:8080/jo/?error=${error}`;
+//	location.href = url;
 	location.href = "http://localhost:8080/jo/";
 }
 
@@ -43,7 +50,7 @@ if(getCookie("refresh") !== null) {
 	if(getCookie("access") === null) {
 		//header에 refresh 넣어서
 		//fetch 해서 access 토큰 받아옴
-		setCookie('access', 'aaaaaa212144444', 1);
+		setCookie('access', 'aaaaaa212144444', 0.08);
 	}
 	//access 값이 있을때
 	//access를 보내서 받아오고 나서 user값 받아오기 fetch
@@ -52,7 +59,7 @@ if(getCookie("refresh") !== null) {
 	userSeq: 1,
 	userName: "김지슬",
 	userEmail: "sone1118@naver.com",
-	userBirth: "1129",
+	userBirth: "1130",
 	userRole: "JOINS",
 	userGrade: "BRONZE",
 	userAgreeMarketing: true,
@@ -66,7 +73,7 @@ if(getCookie("refresh") !== null) {
 	let today = new Date();   
 	let month = today.getMonth() + 1; 
 	let date = today.getDate();  
-	console.log(month, date);
+	console.log(user.userBirth);
 	let compareDate = String(month) + String(date);
 	console.log(compareDate);
 

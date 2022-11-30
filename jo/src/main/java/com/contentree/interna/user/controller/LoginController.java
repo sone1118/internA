@@ -21,7 +21,7 @@ class LoginController {
     	ModelAndView model = new ModelAndView();
     	model.setViewName("home");
     	//error가 있으면 error메세지 보내서 출력하기
-    	if(error != null) model.addObject("error_message", "중복 가입된 정보가 있습니다.");
+    	if(error != null) model.addObject("error_message", error);
     	
     	return model;
     }
@@ -30,6 +30,9 @@ class LoginController {
 //    public token login() {
     	//sns 로그인 시도
     	//로그인이 성공하면 js프론트로 토큰을 보내줌
-    	//로그인이 실패하면 return error를 보내줌
+    	//서버에서 setcookie를 통해서 refresh를 저장하고
+    	//view쪽으로 access만 보내서 변수에 저장한다
+    
+    	//로그인이 실패하면 error를 보내준다 -> js에서 error 가 도착하면 error값을 넣어서 /으로 redirect
 //    }   
 }

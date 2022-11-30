@@ -20,7 +20,7 @@ if(getCookie("refresh")) {
 	if(getCookie("access") === null) {
 		//header에 refresh 넣어서
 		//fetch 해서 access 토큰 받아옴
-		setCookie('access', 'aaaaaa212144444', 1);
+		setCookie('access', 'aaaaaa212144444', 0.08);
 	}
 	//access 값이 있을때
 	//access를 보내서 받아오고 나서 user값 받아오기 fetch
@@ -29,7 +29,7 @@ if(getCookie("refresh")) {
 	userSeq: 1,
 	userName: "김지슬",
 	userEmail: "sone1118@naver.com",
-	userBirth: "19980122",
+	userBirth: "19981130",
 	userRole: "ADMIN",
 	userGrade: "BRONZE",
 	userAgreeMarketing: true,
