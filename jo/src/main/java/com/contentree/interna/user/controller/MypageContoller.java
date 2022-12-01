@@ -53,19 +53,19 @@ public class MypageContoller {
 		Long userSeq = Long.parseLong(principal.getName());
 		String joinsId = mypageSendEmailToJoinsReq.getJoinsId();
 		
-		String answerMessage = mypageService.sendEmailToJoins(userSeq, joinsId);
-		if (answerMessage == "2") {
+		int answerCode = mypageService.sendEmailToJoins(userSeq, joinsId);
+		if (answerCode == 1) {
+			log.info("MypageContoller > mypageSendEmailToJoins - 이미 인증된 사용자입니다. (joinsId : {}, userSeq : {})", joinsId, userSeq);
+			return ResponseEntity.status(400).body("이미 인증된 사용자입니다,");
+		} else if (answerCode == 2) {
 			log.error("MypageContoller > mypageSendEmailToJoins - 이미 인증에 사용된 아이디입니다. (joinsId : {}, userSeq : {})", joinsId, userSeq);
 			return ResponseEntity.status(400).body("이미 인증에 사용된 아이디입니다.");
-		} else if (answerMessage == "3") {
+		} else if (answerCode == 3) {
 			log.error("MypageContoller > mypageSendEmailToJoins - 이메일 전송 실패 (joinsId : {}, userSeq : {})", joinsId, userSeq);
-			return ResponseEntity.status(400).body("잘못된 아이디 입니다.");
-		} else if (answerMessage == "성공") {
+			return ResponseEntity.status(400).body("이메일 전송에 실패하였습니다.");
+		} else {
 			log.info("MypageContoller > mypageSendEmailToJoins - 성공 (joinsId : {}, userSeq : {})", joinsId, userSeq);
 			return ResponseEntity.status(200).body("이메일 전송 성공");
-		} else {
-			log.info("MypageContoller > mypageSendEmailToJoins - 이미 인증된 사용자입니다. (joinsId : {}, userSeq : {})", joinsId, userSeq);
-			return ResponseEntity.status(400).body(answerMessage);
 		}
     }
 }

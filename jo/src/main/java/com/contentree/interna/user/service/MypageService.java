@@ -33,19 +33,19 @@ public class MypageService {
 	private final MailUtil mailUtil;
 	private final RedisUtil redisUtil;
 	
-	public String sendEmailToJoins(Long userSeq, String joinsId) {
+	public int sendEmailToJoins(Long userSeq, String joinsId) {
 		log.info("MypageService > sendEmailToJoins - 호출 (userSeq : {})", userSeq);
 		
 		// 1. 이미 임직원 인증한 회원인지 확인
 		Optional<Joins> joinsById = joinsRepository.findById(userSeq);
 		if(joinsById.isPresent()) {
-			return joinsById.get().getJoinsId();
+			return 1;
 		}
 		
 		// 2. 해당 아이디로 이미 인증한적 있는지 확인
 		Optional<Joins> joinsByJoinsId = joinsRepository.findByJoinsId(joinsId);
 		if(joinsByJoinsId.isPresent()) {
-			return "2";
+			return 2;
 		}
 		
 		// 3. 이메일 전송 
@@ -54,12 +54,12 @@ public class MypageService {
 			mailUtil.sendEmailToJoins(joinsId, randomCode);
 		} catch (MessagingException e) {
 			log.error("MypageService > sendEmailToJoins - 이메일 전송 실패 (userSeq : {}, joinsId : {})", userSeq, joinsId);
-			return "3";
+			return 3;
 		}
 		
 		// 4. 인증번호 레디스에 저장 
 		redisUtil.setDataWithExpire("joins-" + joinsId, randomCode, validationExpiration);
-		return "성공";
+		return 4;
 	}
 
 	
