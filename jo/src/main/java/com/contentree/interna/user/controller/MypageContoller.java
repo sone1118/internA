@@ -1,14 +1,24 @@
 package com.contentree.interna.user.controller;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.contentree.interna.global.common.response.TestResponse;
+import com.contentree.interna.global.common.response.TestResponse2;
+import com.contentree.interna.user.entity.Grade;
+import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.service.MypageService;
 
@@ -21,58 +31,43 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 class MypageControllerController {
 	
-	private final MypageService mypageService;
-	
-//    @PostMapping("/mypage")
-//    public ModelAndView goMypage(HttpServletRequest request) {
-//    	//유저 정보를 얻어온다
-//    	String userEmail = request.getHeader("Authorization");
-//    	//유저 정보를 받아서 view로보내준다.
-//    	
-//    	ModelAndView model = new ModelAndView();
-//
-//    	model.setViewName("mypage");
-//    	model.addObject("userName", "김지슬");
-//    	model.addObject("userEmail", userEmail);
-//    	model.addObject("userBirth", "98.01.22");
-//    	model.addObject("userCreateAt", userEmail);
-//    	model.addObject("userGrade", "G");
-//    	
-//    	//error가 들어 왔으면 /로 error 메세지 같이 보내준ㄷ
-//  	
-//    	return model;
-//    }
-//	@PostMapping("/mypage")
-//	public void test(HttpServletRequest req)throws IOException{
-//		System.out.println(readBody(req));
-//	}
+	private final MypageService mypageService;	
 
-	@PostMapping("/mypage")
-	public ModelAndView readBody(HttpServletRequest request) throws IOException {
-		
+	//단순히 mypage.html로 보내준다
+	@GetMapping("/mypage")
+    public ModelAndView mypage() {    
 		ModelAndView model = new ModelAndView();
-    	model.setViewName("mypage");
-    	model.addObject("userName", "김지슬");
-    	model.addObject("userBirth", "98.01.22");
-    	model.addObject("userGrade", "G");
-		//서비스 로직 넣기
-		//Principal principal 
-		// principal.getname(); //String -> userSeq임
-		Long userSeq = 1L;
+		model.setViewName("mypage");
+    	return model;
+    }
+
+	//mypage에서 정보를 요청할때
+	//이름, 이메일, 생년월일, 가입일, 회원등급
+	@PostMapping("/api/mypage")
+	public ResponseEntity<TestResponse> readBody(HttpServletRequest request) throws IOException {
+		
+		System.out.println(request.getHeader("Authorization"));
+		String userSeqString = request.getHeader("Authorization");
+		Long userSeq = Long.parseLong(userSeqString);
 		Optional<User> user = mypageService.getUserDetail(userSeq);
+		
 		if (user.isPresent()) {
 			User user2 = user.get();
-			log.error(user2.getUserEmail());
+			log.error("유저가 있어");
+					
+			TestResponse testResponse = new TestResponse();
+			testResponse.setUserName(user2.getUserName());
+			testResponse.setUserEmail(user2.getUserEmail().replaceAll("[A-Za-z0-9]", "*"));
+			testResponse.setUserBirth(user2.getUserBirth());
+			testResponse.setUserCreateAt(user2.getUserBirth());
+			testResponse.setUserGrade(user2.getUserGrade());
 			
-	    	model.addObject("userEmail", user2.getUserEmail());
-	    	model.addObject("userCreateAt", user2.getUserEmail());
+			return ResponseEntity.status(200).body(testResponse);
+			//return ResponseEntity.status(200).body(user2);
+		} else {	
+			log.error("유저가 없어");
+			return ResponseEntity.status(400).build();
 		}
-		
-		return model;
-//			String test = request.getHeader("Authorization");
-//			System.out.println(test);
-//			System.out.println(user.get().getUserEmail());
-			
 	}
 }
 

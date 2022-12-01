@@ -1,4 +1,4 @@
-const setCookie = function (name, value, expiredDay) {
+const setCookie = (name, value, expiredDay) => {
     const expired = new Date();
     //access 2시간 refresh 2주
     expired.setTime(expired.getTime() + expiredDay * 24 * 60 * 60 * 1000);
@@ -6,23 +6,22 @@ const setCookie = function (name, value, expiredDay) {
     document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + expired.toUTCString() + ';path=/';
 };
 
-const getCookie = function (name) {
+const getCookie = (name) => {
     var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
     return value ? decodeURIComponent(value[2]) : null;
 };
 
-const deleteCookie = function (name) {
-    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
-    
-}
+const deleteCookie = (name) => {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;'; 
+};
 
-function onDelete() {
+const onDelete = () => {
 	deleteCookie("refresh");
 	deleteCookie("access");
 	location.href = "http://localhost:8080/jo/";
-}
+};
 
-function onClick(e) {
+const onClick = (e) => {
 	const target = e.target.id;
 	const contents = document.querySelector(".modal_contents");
 	const birth_text= "<h2>메가박스</h2><p>[생일쿠폰]</p><p>- 팝콘(L) 무료: 오리지날 또는 카라멜 중 택1(맛 변경, 업그레이드 등 불가)</p><p>- 생일 쿠폰은 회원 정보 상 등록 되어 있는 생일 2주전, 회원 계정으로 자동 발급됩니다.</p>	<p>- VIP 회원 생일 쿠폰 '콤보 무료' 는 기존과 동일하게 지급됩니다.</p><p>- 일정 및 내용은 사정에 따라 변동 될 수 있습니다.</p><br><br><h2>휘닉스</h2><p>- 생일 할인: 리프트, 렌탈 반값 혜택(주민등록상 생일 당일, 1회만 가능)</p>	";
@@ -38,15 +37,9 @@ function onClick(e) {
 	}
 	document.querySelector(".modal_wrap").style.display = "block";
 	document.querySelector(".black_bg").style.display = "block";
-}
-function offClick() {
+};
+
+const offClick = () => {
 	document.querySelector(".modal_wrap").style.display = "none";
 	document.querySelector(".black_bg").style.display = "none";
-}
-
-function onDelete() {
-	deleteCookie("refresh");
-	deleteCookie("access");
-	location.href = "http://localhost:8080/jo/";
-}
-
+};
