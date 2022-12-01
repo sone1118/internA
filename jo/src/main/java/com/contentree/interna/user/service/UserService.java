@@ -17,6 +17,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.contentree.interna.global.util.JwtTokenUtil;
+import com.contentree.interna.global.util.RedisUtil;
+import com.contentree.interna.user.dto.UserDto;
 import com.contentree.interna.user.entity.Grade;
 import com.contentree.interna.user.entity.KakaoProfile;
 import com.contentree.interna.user.entity.Role;
@@ -35,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
 	private final UserRepository userRepository;
 	private final JwtTokenUtil jwtTokenUtil;
+	private final RedisUtil redisUtil;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
 	String client_id;
@@ -46,7 +49,7 @@ public class UserService {
 	String redirect_uri;
 
 	public OauthToken getAccessToken(String code) throws IOException {
-
+		log.info("UserService > getAccessToken - 인가코드 값으로 Token 생성");
 		// POST 방식으로 key=value 데이터 요청
 		RestTemplate rt = new RestTemplate();
 
@@ -75,6 +78,7 @@ public class UserService {
 		try {
 			oauthToken = objectMapper.readValue(accessTokenResponse.getBody(), OauthToken.class);
 		} catch (JsonProcessingException e) {
+			log.error("UserService > getAccessToken - oauthToken 생성 실패");
 			e.printStackTrace();
 		}
 
@@ -82,6 +86,8 @@ public class UserService {
 	}
 
 	public KakaoProfile findProfile(String token) throws IOException {
+		log.info("UserService > findProfile - KakaoProfile 형식에 맞는 객체 반환");
+
 		// POST 방식으로 key=value 데이터 요청
 		RestTemplate rt = new RestTemplate();
 
@@ -104,6 +110,7 @@ public class UserService {
 			kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoProfile.class);
 			log.info("kakaoProfileResponse.body = {}", kakaoProfileResponse.getBody());
 		} catch (JsonProcessingException e) {
+			log.error("kakaoProfile 생성 실패");
 			e.printStackTrace();
 		}
 
@@ -111,6 +118,7 @@ public class UserService {
 	}
 
 	public User getUser(HttpServletRequest request) {
+		log.info("UserService > getUser - userSeq로 유저를 찾음");
 		Long userSeq = (Long) request.getAttribute("userSeq");
 
 		User user = userRepository.findByUserSeq(userSeq);
@@ -118,33 +126,45 @@ public class UserService {
 		return user;
 	}
 
-	public String SaveUserAndGetToken(String token) throws IOException {
+	public UserDto SaveUserAndGetToken(String token) throws IOException {
+		log.info(
+				"UserService > SaveUserAndGetToken - token을 사용히여 유저를 조회 후 db에 저장. accessToken, refreshToken을 생성하고 redis에 저장 후 userDto 객체 반환.");
 		KakaoProfile profile = findProfile(token);
 
 		User user = userRepository.findByUserEmail(profile.getKakao_account().getEmail());
+
 		Calendar cal = Calendar.getInstance();
 		int year = 1998;
 		String birth = profile.getKakao_account().getBirthday();
 		int month = Integer.parseInt(birth.substring(0, 3));
 		int day = Integer.parseInt(birth.substring(2));
 		cal.set(year, month, day);
-		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-		if (user == null) {// TODO 하드 코딩 해둠 변경 필요
-			user = User.builder()// TODO .userSeq(profile.getId()) userSeq도 설정해줘야 하나?
-					.userName(profile.getKakao_account().getProfile().getNickname())
-					.userEmail(profile.getKakao_account().getEmail()).userPhone("01012341234")
-					.userBirth(cal)
-					.userKakaoId(profile.getId())
-					.userRole(Role.USER)
-					.userGrade(Grade.BRONZE)
-					.userAgreeMarketing(true)
+
+		if (user == null) {
+			user = User.builder().userName(profile.getKakao_account().getProfile().getNickname())
+					.userEmail(profile.getKakao_account().getEmail()).userPhone("01012341234").userBirth(cal)
+					.userKakaoId(profile.getId()).userRole(Role.USER).userGrade(Grade.BRONZE).userAgreeMarketing(true)
 					.userAgreeMarketing(true).build();
 
 			userRepository.save(user);
 		}
 
-		return jwtTokenUtil.createAccessToken(user.getUserSeq());// access token
+		// TODO access token, refresh token 생성
+		String accessToken = jwtTokenUtil.createAccessToken(user.getUserSeq());
+		String refreshToken = jwtTokenUtil.createRefreshToken();
+
+		// TODO redis에 {refresh:userSeq} 저장
+		redisUtil.setDataWithExpire(refreshToken, Long.toString(user.getUserSeq()), null);
+		log.info("save data to redis (refresh token : userSeq) = ({} : {})", refreshToken, user.getUserSeq());
+		log.info("######토큰 저장 확인 {}:{}######", redisUtil.getData(refreshToken));
+
+		// TODO controller로 전달
+		UserDto userDto = UserDto.builder().userName(user.getUserName()).userGrade(user.getUserGrade())
+				.userRole(user.getUserRole()).accessToken(accessToken).refreshToken(refreshToken).build();
+
+		return userDto;
+//		return jwtTokenUtil.createAccessToken(user.getUserSeq());// access token
 	}
 
 }
