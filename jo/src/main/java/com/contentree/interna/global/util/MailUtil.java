@@ -8,6 +8,7 @@ import javax.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@EnableAsync
 public class MailUtil {
 	
 	private final JavaMailSender javaMailSender;
@@ -58,6 +60,7 @@ public class MailUtil {
         helper.setText(html, true);
         
         javaMailSender.send(message);
+        log.info("MailUtil > sendEmailToJoins - 이메일 전송 완료 (joinsId : {})", joinsId);
     }
     
 

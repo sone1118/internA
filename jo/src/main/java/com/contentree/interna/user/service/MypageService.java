@@ -39,12 +39,14 @@ public class MypageService {
 		// 1. 이미 임직원 인증한 회원인지 확인
 		Optional<Joins> joinsById = joinsRepository.findById(userSeq);
 		if(joinsById.isPresent()) {
+			log.error("MypageService > sendEmailToJoins - 이미 인증된 사용자입니다. (joinsId : {}, userSeq : {})", joinsId, userSeq);
 			return 1;
 		}
 		
 		// 2. 해당 아이디로 이미 인증한적 있는지 확인
 		Optional<Joins> joinsByJoinsId = joinsRepository.findByJoinsId(joinsId);
 		if(joinsByJoinsId.isPresent()) {
+			log.error("MypageService > sendEmailToJoins - 이미 인증에 사용된 아이디입니다. (joinsId : {}, userSeq : {})", joinsId, userSeq);
 			return 2;
 		}
 		
