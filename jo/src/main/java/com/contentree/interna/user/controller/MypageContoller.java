@@ -67,24 +67,5 @@ public class MypageContoller {
 			log.info("MypageContoller > mypageSendEmailToJoins - 이미 인증된 사용자입니다. (joinsId : {}, userSeq : {})", joinsId, userSeq);
 			return ResponseEntity.status(400).body(answerMessage);
 		}
-		
- 
     }
-	
-	@Tag(name="마이페이지")
-	@GetMapping("/login")
-	@Operation(summary = "로그인테스트", description = "중앙 임직원 여부를 확인하기 위해 joins 이메일에 인증 코드를 전송합니다.")
-	@ApiResponses({
-	        @ApiResponse(responseCode = "200", description = "이메일 전송 성공"),
-	        @ApiResponse(responseCode = "400", description = "이메일 전송 실패")
-	        })
-    public String login(HttpServletResponse response) {
-		log.info("sendEmailForJoins - 호출");
-		String token = jwtTokenUtil.createAccessToken(1);
-		String retString = jwtTokenUtil.createRefreshToken();
-		response.addCookie(cookieUtil.createCookie("re-auth", retString));
-		return token;
- 
-    }
-
 }
