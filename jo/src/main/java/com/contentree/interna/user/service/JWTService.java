@@ -21,7 +21,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class JWTService {
 	// TODO jwt.secret 키 재설정
-	@Value("${jwt.secret}") // site.jwt.secret
+	@Value("${spring.security.jwt.secret}") // site.jwt.secret
 	private String secret;
 
 	/**

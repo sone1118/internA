@@ -60,14 +60,14 @@ spring:
             client-secret: lBCmxqDN1wITFdZB9m7WlSHuZ93w2dsV
             scope: profile-nickname, account-email, brithday
             client-authentication-method: POST
-            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            redirect-uri: http://localhost:8080/kakao/callback
             authorization-grant-type: authorization_code
             client-name: Kakao
     user:
       name: interna
       password: interna123!
     jwt:
-      secret: in1tern1a18cont0en1tree22!
+      secret: in1tern1a18cont0en1tree22!in1tern1a18cont0en1tree22in1tern1a18cont0en1tree22
       access-token-expiration: 123412
       refresh-token-expiration: 12341251
   jpa:

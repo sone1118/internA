@@ -7,7 +7,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -24,8 +23,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@RequiredArgsConstructor
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -40,15 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final CookieUtil cookieUtil;
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RedisUtil redisUtil;
-
-	@Autowired
-	public JwtAuthenticationFilter(CustomUserDetailsService customUserDetailsService, CookieUtil cookieUtil,
-			JwtTokenUtil jwtTokenUtil, RedisUtil redisUtil) {
-		this.customUserDetailsService = customUserDetailsService;
-		this.cookieUtil = cookieUtil;
-		this.jwtTokenUtil = jwtTokenUtil;
-		this.redisUtil = redisUtil;
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

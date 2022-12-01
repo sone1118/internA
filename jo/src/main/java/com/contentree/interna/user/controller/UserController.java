@@ -16,6 +16,9 @@ import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.oauth2.OauthToken;
 import com.contentree.interna.user.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -26,8 +29,8 @@ public class UserController {
 	// 프론트에서 인가코드 돌려 받는 주소
 	// 인가 코드로 엑세스 토큰 발급 -> 사용자 정보 조회 -> DB 저장 -> jwt 토큰 발급 -> 프론트에 토큰 전달
 	@GetMapping("/oauth/token")
-	public ResponseEntity getLogin(@RequestParam("code") String code) throws IOException {
-
+	public String getLogin(@RequestParam(value = "code") String code) throws IOException {
+		log.info("========================getLogin==================================");
 		// 넘어온 인가 코드를 통해 access_token 발급
 		OauthToken oauthToken = userService.getAccessToken(code);
 
@@ -35,10 +38,10 @@ public class UserController {
 		String jwtToken = userService.SaveUserAndGetToken(oauthToken.getAccess_token());
 
 		HttpHeaders headers = new HttpHeaders();
-//		headers.add(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
-		headers.add("Bearer ", "Authorization" + jwtToken);
+//		headers.add(JwtProperties.HEADER_STRING, JwtPropert?ies.TOKEN_PREFIX + jwtToken);
+		headers.add("Authorization", "Bearer " + jwtToken);
 
-		return ResponseEntity.ok().headers(headers).body("success");
+		return "redirect:/";
 	}
 
 	// jwt 토큰으로 유저정보 요청하기

@@ -1,6 +1,8 @@
 package com.contentree.interna.user.service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,19 +27,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
-	public static final String FRONT_URL = "http://localhost:8080";
 	private final JwtTokenUtil jwtTokenUtil;
 
-	@Value("${spring.security.client.registration.kakao.client-id}")
+	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
 	String client_id;
 
-	@Value("${spring.security.client.registration.kakao.client-secret}")
+	@Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
 	String client_secret;
+
+	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+	String redirect_uri;
 
 	public OauthToken getAccessToken(String code) throws IOException {
 
@@ -52,7 +58,7 @@ public class UserService {
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("grant_type", "authorization_code");
 		params.add("client_id", client_id);
-		params.add("redirect_uri", FRONT_URL + "/auth");
+		params.add("redirect_uri", redirect_uri);
 		params.add("code", code);
 		params.add("client_secret", client_secret);
 
@@ -96,9 +102,7 @@ public class UserService {
 		KakaoProfile kakaoProfile = null;
 		try {
 			kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoProfile.class);
-			System.out.println("=================================================");
-			System.out.println(kakaoProfileResponse.getBody());
-			System.out.println("=================================================");
+			log.info("kakaoProfileResponse.body = {}", kakaoProfileResponse.getBody());
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -118,10 +122,23 @@ public class UserService {
 		KakaoProfile profile = findProfile(token);
 
 		User user = userRepository.findByUserEmail(profile.getKakao_account().getEmail());
+		Calendar cal = Calendar.getInstance();
+		int year = 1998;
+		String birth = profile.getKakao_account().getBirthday();
+		int month = Integer.parseInt(birth.substring(0, 3));
+		int day = Integer.parseInt(birth.substring(2));
+		cal.set(year, month, day);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		if (user == null) {// TODO 하드 코딩 해둠 변경 필요
 			user = User.builder()// TODO .userSeq(profile.getId()) userSeq도 설정해줘야 하나?
-					.userName("EXUSERNAME").userEmail(profile.getKakao_account().getEmail()).userPhone("01012345678")
-					.userKakaoId(profile.getId()).userRole(Role.JOINS).userGrade(Grade.BRONZE).userAgreeMarketing(true)
+					.userName(profile.getKakao_account().getProfile().getNickname())
+					.userEmail(profile.getKakao_account().getEmail()).userPhone("01012341234")
+					.userBirth(cal)
+					.userKakaoId(profile.getId())
+					.userRole(Role.USER)
+					.userGrade(Grade.BRONZE)
+					.userAgreeMarketing(true)
 					.userAgreeMarketing(true).build();
 
 			userRepository.save(user);

@@ -11,8 +11,12 @@ import com.contentree.interna.user.repository.UserRepository;
 @Service
 public class CustomUserDetailsService {
 
-	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	public CustomUserDetailsService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 	// userSeq로 유저 데이터 가져오기
 	public User getUserDetail(Long userSeq) {

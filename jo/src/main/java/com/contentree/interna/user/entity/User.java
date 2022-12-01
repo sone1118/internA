@@ -1,6 +1,6 @@
 package com.contentree.interna.user.entity;
 
-import java.util.Date;
+import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "user")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseTime {
+public class User {
 	@Id
 	@Column(name = "user_seq")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class User extends BaseTime {
 
 	@Column(name = "user_birth")
 	@Temporal(TemporalType.DATE)
-	private Date userBirth;
+	private Calendar userBirth;
 
 	@Column(name = "user_kakao_id")
 	private Long userKakaoId;
@@ -59,7 +59,7 @@ public class User extends BaseTime {
 	private boolean userAgreeSns;
 
 	@Builder
-	public User(Long userSeq, String userName, String userEmail, String userPhone, Date userBirth, Long userKakaoId,
+	public User(Long userSeq, String userName, String userEmail, String userPhone, Calendar userBirth, Long userKakaoId,
 			Role userRole, Grade userGrade, boolean userAgreeMarketing, boolean userAgreeSns) {
 		this.userSeq = userSeq;
 		this.userName = userName;
