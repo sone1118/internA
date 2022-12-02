@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.contentree.interna.global.util.CookieUtil;
+import com.contentree.interna.user.dto.OauthTokenDto;
 import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
 import com.contentree.interna.user.dto.UserGetLoginRes;
-import com.contentree.interna.user.oauth2.OauthToken;
 import com.contentree.interna.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,7 +57,7 @@ public class UserController {
 		log.info("UserController > getLogin - 인가코드로 토큰 발급, 사용자 정보와 토큰 저장");
 		// 넘어온 인가 코드를 통해 access_token 발급
 
-		OauthToken oauthToken = userService.getAccessToken(code);
+		OauthTokenDto oauthToken = userService.getAccessToken(code);
 
 		if (oauthToken == null) {
 			log.error("UserController > getLogin - 토큰 생성 실패");

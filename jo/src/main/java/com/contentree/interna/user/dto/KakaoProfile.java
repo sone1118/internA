@@ -1,4 +1,4 @@
-package com.contentree.interna.user.entity;
+package com.contentree.interna.user.dto;
 
 import lombok.Data;
 

@@ -8,6 +8,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	// select * from user_master where kakao_email = ?
 	public User findByUserPhone(String userPhone);
 
-	public User findByUserSeq(Long userSeq);
-
 }

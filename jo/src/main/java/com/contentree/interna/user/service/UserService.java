@@ -16,12 +16,12 @@ import org.springframework.web.client.RestTemplate;
 
 import com.contentree.interna.global.util.JwtTokenUtil;
 import com.contentree.interna.global.util.RedisUtil;
+import com.contentree.interna.user.dto.KakaoProfile;
+import com.contentree.interna.user.dto.OauthTokenDto;
 import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
 import com.contentree.interna.user.entity.Grade;
-import com.contentree.interna.user.entity.KakaoProfile;
 import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
-import com.contentree.interna.user.oauth2.OauthToken;
 import com.contentree.interna.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +46,7 @@ public class UserService {
 	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
 	String redirect_uri;
 
-	public OauthToken getAccessToken(String code) {
+	public OauthTokenDto getAccessToken(String code) {
 		log.info("UserService > getAccessToken - 인가코드 값으로 Token 생성");
 		// POST 방식으로 key=value 데이터 요청
 		RestTemplate rt = new RestTemplate();
@@ -73,8 +73,8 @@ public class UserService {
 
 			// JSON 응답을 객체로 변환
 			ObjectMapper objectMapper = new ObjectMapper();
-			OauthToken oauthToken = null;
-			oauthToken = objectMapper.readValue(accessTokenResponse.getBody(), OauthToken.class);
+			OauthTokenDto oauthToken = null;
+			oauthToken = objectMapper.readValue(accessTokenResponse.getBody(), OauthTokenDto.class);
 			return oauthToken;
 		} catch (JsonProcessingException e) {
 			log.error("UserService > getAccessToken - Json 파싱 실패");
