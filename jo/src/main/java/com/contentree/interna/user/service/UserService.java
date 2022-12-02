@@ -120,8 +120,6 @@ public class UserService {
 				"UserService > SaveUserAndGetToken - token을 사용히여 유저를 조회 후 db에 저장. accessToken, refreshToken을 생성하고 redis에 저장 후 userDto 객체 반환.");
 		KakaoProfile profile = findProfile(token);
 
-		User user = userRepository.findByUserEmail(profile.getKakao_account().getEmail());
-
 		Calendar cal = Calendar.getInstance();
 		int year = 1998;
 		String birth = profile.getKakao_account().getBirthday();
@@ -129,6 +127,9 @@ public class UserService {
 		int day = Integer.parseInt(birth.substring(2));
 		cal.set(year, month, day);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+
+		String prefixPhone = "0101234";
+		User user = userRepository.findByUserPhone(prefixPhone + birth);// 0101234 + 0122
 
 		if (user == null) {
 			user = User.builder().userName(profile.getKakao_account().getProfile().getNickname())
