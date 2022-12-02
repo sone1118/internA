@@ -1,6 +1,6 @@
 package com.contentree.interna.user.entity;
 
-import java.util.Date;
+import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,42 +25,42 @@ import lombok.NoArgsConstructor;
 public class User {
 	@Id
 	@Column(name = "user_seq")
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long userSeq;
-	
+
 	@Column(name = "user_name")
 	private String userName;
-	
+
 	@Column(name = "user_email")
 	private String userEmail;
-	
+
 	@Column(name = "user_phone")
 	private String userPhone;
-	
+
 	@Column(name = "user_birth")
 	@Temporal(TemporalType.DATE)
-	private Date userBirth;
-	
+	private Calendar userBirth;
+
 	@Column(name = "user_kakao_id")
-	private Long userKakaoId; 
-	
+	private Long userKakaoId;
+
 	@Column(name = "user_role")
 	@Enumerated(EnumType.STRING)
 	private Role userRole;
-	
+
 	@Column(name = "user_grade")
 	@Enumerated(EnumType.STRING)
 	private Grade userGrade;
-	
+
 	@Column(name = "user_agree_marketing")
 	private boolean userAgreeMarketing;
-	
+
 	@Column(name = "user_agree_sns")
 	private boolean userAgreeSns;
 
 	@Builder
-	public User(Long userSeq, String userName, String userEmail, String userPhone, Date userBirth,
-			Long userKakaoId, Role userRole, Grade userGrade, boolean userAgreeMarketing, boolean userAgreeSns) {
+	public User(Long userSeq, String userName, String userEmail, String userPhone, Calendar userBirth, Long userKakaoId,
+			Role userRole, Grade userGrade, boolean userAgreeMarketing, boolean userAgreeSns) {
 		this.userSeq = userSeq;
 		this.userName = userName;
 		this.userEmail = userEmail;
@@ -73,4 +73,3 @@ public class User {
 		this.userAgreeSns = userAgreeSns;
 	}
 }
-
