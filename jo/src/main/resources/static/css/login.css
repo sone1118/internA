@@ -118,11 +118,11 @@ h1 {
 	cursor: pointer;
 }
 
-#phone {
+#phone_btn, #email_btn {
 	margin-top: 20px;
 	padding: 0 10px;
 	height: 50px;
-	width: 100px;
+	width: 150px;
 	border: none;
 	border-radius: 15px;
 	text-decoration: none;
@@ -148,7 +148,7 @@ h1 {
 #login_button #kakao_logo {
 	width: 1.3rem;
 }
-#login_button:hover {
+#login_button:hover, #phone_btn:hover, #email_btn:hover {
 	cursor: pointer;
 	filter: brightness(0.95);
 }

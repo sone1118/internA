@@ -9,6 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class WithdrawalController {
 
+	// [ 손헤진 ] go to withdrawal.html
     @GetMapping("/withdrawal")
     public ModelAndView home(@RequestParam(value = "error", required = false) String error) {
 
