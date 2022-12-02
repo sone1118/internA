@@ -12,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/kakao")
 public class KakaoController {
 	// 인가코드 받기 위해 카카오 서버와 connect
-	@Value("${spring.security.oauth2.client.registration.kaka.client-id}")
+	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
 	String clientId;
-	@Value("${spring.security.oauth2.client.registration.client-secret}")
+	@Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
 	String clientSecret;
-	@Value("${spring.security.oauth2.client.registration.redirect-uri}")
+	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
 	String redirectUri;
 
 	@GetMapping(value = "/oauth")

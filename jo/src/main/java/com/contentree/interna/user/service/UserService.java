@@ -143,7 +143,9 @@ public class UserService {
 					.userKakaoId(profile.getId()).userRole(Role.ROLE_USER).userGrade(Grade.BRONZE)
 					.userAgreeMarketing(true).userAgreeMarketing(true).build();
 			userRepository.save(user);
-		} else if (user.getUserEmail() != profile.getKakao_account().getEmail()) {// 중복가입
+		} else if (!user.getUserEmail().equals(profile.getKakao_account().getEmail())) {// 중복가입
+			log.error(user.getUserEmail());
+			log.error(profile.getKakao_account().getEmail());
 			log.error("UserService > SaveUserAndGetToken - 유저정보가 데이터베이스에 이미 존재");
 			return null;
 		}
@@ -153,7 +155,7 @@ public class UserService {
 		String refreshToken = jwtTokenUtil.createRefreshToken();
 
 		// redis에 {refresh:userSeq} 저장
-		redisUtil.setDataWithExpire(refreshToken, Long.toString(user.getUserSeq()), null);
+		redisUtil.setDataWithExpire(refreshToken, Long.toString(user.getUserSeq()), 10000);
 		log.info("save data to redis (refresh token : userSeq) = ({} : {})", refreshToken, user.getUserSeq());
 		log.info("######토큰 저장 확인 {}:{}######", redisUtil.getData(refreshToken));
 
@@ -165,4 +167,7 @@ public class UserService {
 		return userDto;
 	}
 
+	public String logout() {
+		return "";
+	}
 }

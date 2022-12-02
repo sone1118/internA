@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.contentree.interna.global.util.CookieUtil;
+import com.contentree.interna.global.util.RedisUtil;
 import com.contentree.interna.user.dto.OauthTokenDto;
 import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
 import com.contentree.interna.user.dto.UserGetLoginRes;
@@ -32,11 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+//@RequestMapping("/api")
 public class UserController {
 
 	private final UserService userService;
 	private final CookieUtil cookieUtil;
+	private final RedisUtil redisUtil;
 
 	@Value("${spring.cookie.refresh-cookie-name}")
 	private String refreshCookieName;
@@ -51,7 +52,8 @@ public class UserController {
 	@Operation(summary = "카카오 로그인 처리", description = "카카오 서버를 통해 인가코드와 토큰을 받아 유저 정보를 저장합니다.")
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = "로그인 성공"),
 			@ApiResponse(responseCode = "400", description = "로그인 실패") })
-	@GetMapping("/oauth/token")
+//	@GetMapping("/oauth/token")
+	@GetMapping("/kakao/callback")
 	public ResponseEntity<UserGetLoginRes> getLogin(@RequestParam(value = "code") String code,
 			HttpServletResponse httpServletResponse) {
 		log.info("UserController > getLogin - 인가코드로 토큰 발급, 사용자 정보와 토큰 저장");
@@ -87,5 +89,11 @@ public class UserController {
 
 		return ResponseEntity.ok().body(userGetLoginRes);
 	}
+
+//	@GetMapping("/logout")
+//	public String logout(HttpServletRequest request) {
+//		String accessToken = 
+//		return "";
+//	}
 
 }
