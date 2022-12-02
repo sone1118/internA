@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum Role {
-	USER, JOINS, ADMIN;
+	ROLE_USER, ROLE_JOINS, ROLE_ADMIN;
 
 	public String toString() {
 		return this.name();
