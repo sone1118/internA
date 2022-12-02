@@ -10,7 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class UserDto {
+public class SaveUserAndGetTokenRes {
 	String refreshToken;
 	String accessToken;
 	String userName;

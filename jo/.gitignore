@@ -11,21 +11,6 @@ application-dev.yml
 .springBeans
 .sts4-cache
 
-<<<<<<< HEAD
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/build/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-=======
 ### Eclipse ###
 .metadata
 bin/
@@ -38,4 +23,3 @@ local.properties
 .settings/
 .loadpath
 .recommenders
->>>>>>> 62d06d297953409eeb579d498a2e954ed624e146

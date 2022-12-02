@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.contentree.interna.global.util.JwtTokenUtil;
 import com.contentree.interna.global.util.RedisUtil;
-import com.contentree.interna.user.dto.UserDto;
+import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
 import com.contentree.interna.user.entity.Grade;
 import com.contentree.interna.user.entity.KakaoProfile;
 import com.contentree.interna.user.entity.Role;
@@ -117,16 +115,7 @@ public class UserService {
 		return kakaoProfile;
 	}
 
-	public User getUser(HttpServletRequest request) {
-		log.info("UserService > getUser - userSeq로 유저를 찾음");
-		Long userSeq = (Long) request.getAttribute("userSeq");
-
-		User user = userRepository.findByUserSeq(userSeq);
-
-		return user;
-	}
-
-	public UserDto SaveUserAndGetToken(String token) throws IOException {
+	public SaveUserAndGetTokenRes SaveUserAndGetToken(String token) throws IOException {
 		log.info(
 				"UserService > SaveUserAndGetToken - token을 사용히여 유저를 조회 후 db에 저장. accessToken, refreshToken을 생성하고 redis에 저장 후 userDto 객체 반환.");
 		KakaoProfile profile = findProfile(token);
@@ -160,8 +149,9 @@ public class UserService {
 		log.info("######토큰 저장 확인 {}:{}######", redisUtil.getData(refreshToken));
 
 		// TODO controller로 전달
-		UserDto userDto = UserDto.builder().userName(user.getUserName()).userGrade(user.getUserGrade())
-				.userRole(user.getUserRole()).accessToken(accessToken).refreshToken(refreshToken).build();
+		SaveUserAndGetTokenRes userDto = SaveUserAndGetTokenRes.builder().userName(user.getUserName())
+				.userGrade(user.getUserGrade()).userRole(user.getUserRole()).accessToken(accessToken)
+				.refreshToken(refreshToken).build();
 
 		return userDto;
 //		return jwtTokenUtil.createAccessToken(user.getUserSeq());// access token

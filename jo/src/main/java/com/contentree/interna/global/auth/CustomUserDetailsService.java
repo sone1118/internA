@@ -2,7 +2,6 @@ package com.contentree.interna.global.auth;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.contentree.interna.user.entity.User;
@@ -13,7 +12,6 @@ public class CustomUserDetailsService {
 
 	private UserRepository userRepository;
 
-	@Autowired
 	public CustomUserDetailsService(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}

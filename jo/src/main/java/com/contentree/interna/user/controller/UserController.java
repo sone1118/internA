@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.contentree.interna.global.util.CookieUtil;
-import com.contentree.interna.user.dto.UserDto;
+import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
 import com.contentree.interna.user.oauth2.OauthToken;
 import com.contentree.interna.user.service.UserService;
 
@@ -38,7 +38,7 @@ public class UserController {
 		OauthToken oauthToken = userService.getAccessToken(code);
 
 		// 발급 받은 accessToken 으로 카카오 회원 정보 DB 저장
-		UserDto userDto = userService.SaveUserAndGetToken(oauthToken.getAccess_token());
+		SaveUserAndGetTokenRes userDto = userService.SaveUserAndGetToken(oauthToken.getAccess_token());
 
 		HttpHeaders headers = new HttpHeaders();
 //		headers.add(JwtProperties.HEADER_STRING, JwtPropert?ies.TOKEN_PREFIX + jwtToken);
