@@ -1,3 +1,4 @@
+/*
 const setCookie = (name, value, expiredDay) => {
     const expired = new Date();
     //access 2시간 refresh 2주
@@ -49,3 +50,4 @@ const offClick = () => {
 	document.querySelector(".modal_wrap").style.display = "none";
 	document.querySelector(".black_bg").style.display = "none";
 };
+*/

@@ -1,14 +1,11 @@
 package com.contentree.interna.user.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-
-@Setter
-@Getter
+@Data
 public class HomeGetUserDetailRes {
-	String userName;
-	String userGrade;
-	Boolean userRole;
-	Boolean userBirth;
+	 String userName;
+	 String userGrade;
+	 Boolean userRole;
+	 Boolean userBirth;
 }

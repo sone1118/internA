@@ -1,3 +1,4 @@
+/*
 const userName = document.querySelector("#userName");
 const userEmail = document.querySelector("#userEmail");
 const userBirth = document.querySelector("#userBirth");
@@ -63,3 +64,4 @@ else { //리프레쉬 토큰이 없으면 logout user = 카카오로 로그인�
 	deleteCookie('access');
 	location.href = "http://localhost:8080/jo/";
 }
+*/

@@ -1,3 +1,4 @@
+/*
 if(getCookie("refresh")) {
 	const header = document.querySelector(".header");
 	const logout = document.querySelector("#logout");
@@ -8,3 +9,4 @@ if(getCookie("refresh")) {
 }else {
 	document.querySelector(".header").classList.add("hidden");
 }
+*/

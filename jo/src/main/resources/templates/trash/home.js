@@ -1,3 +1,4 @@
+/*
 const header = document.querySelector(".header");
 const content2 = document.querySelector(".content2");
 const content1 = document.querySelector(".content1");
@@ -5,7 +6,7 @@ const level = document.querySelector("#level");
 const joins = document.querySelector("#joins");
 const user_name = document.querySelector("#user_name");
 
-//리프레쉬가토큰이 있으면 login user 정보를 받아온다.
+//리프레쉬 토큰이 있으면 login user 정보를 받아온다.
 //이름, 생일, Role, Grade
 if(getCookie("refresh") !== null) {
 	
@@ -14,7 +15,7 @@ if(getCookie("refresh") !== null) {
 	
 	//access와 refresh는 전부 쿠키에 담아서 보낸다
 	//쿠키로 확인을 할 것이기 때문에 따로 header에 넣어 줘야 하는 부분은 없다.
-	fetch("http://localhost:8080/jo/api/users",{
+	fetch("http://localhost:8080/jo/api/home",{
         method : 'POST',
         mode : 'cors',
         cache : 'no-cache',
@@ -81,3 +82,4 @@ else {//리프레쉬 토큰이 없으면 logout user = 카카오로 로그인하
 	content2.classList.add("hidden");
 	content1.classList.remove("hidden");
 }
+*/

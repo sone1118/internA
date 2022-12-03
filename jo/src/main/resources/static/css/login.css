@@ -49,7 +49,7 @@ h1 {
 	color: tomato;
 	font-weight: 700;
 }
-.content1, .content2, .content3{
+.content1, .content2{
 	width: 100;
 	height: 80vh;
 	display: flex;
@@ -70,20 +70,20 @@ h1 {
 	display: flex;
 	justify-content: space-between;
 }
-.content1 div, .content2 div, .content3 div {
+.content1 div, .content2 div{
 	padding-top: 20px;
 }
-.content1 #user_logo, .content3 #user_logo {
+.content1 #user_logo{
 	width: 150px;
+}
+.content2 #user_logo {
+	width: 180px;
 }
 #joins_check {
 	display: flex;
 	justify-content: space-between;
 }
-.content2 #user_logo {
-	width: 180px;
-}
-.content2 #level_joins_name {
+.content2 #grade_role_name {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -101,15 +101,15 @@ h1 {
 	text-align: center;
 	cursor: pointer;
 }
-.content2 #joins{
+.content2 #role{
 	background-color: red;
 	color: white;
 }
-.content2 #level{
+.content2 #grade{
 	background-color: blue;
 	color: white;
 }
-.content2 #level:hover, #joins:hover, #gift_logo:hover{
+.content2 #grade:hover, #role:hover, #gift_logo:hover{
 	opacity: 0.5;
 }
 
@@ -145,7 +145,7 @@ h1 {
 	font-size: 1.3rem;
 }
 
-#login_button #kakao_logo {
+#login_button #kakao_btn {
 	width: 1.3rem;
 }
 #login_button:hover, #phone_btn:hover, #email_btn:hover {

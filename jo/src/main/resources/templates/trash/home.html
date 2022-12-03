@@ -20,6 +20,7 @@
 				<img 
 					id="kakao_logo" 
 					th:src="@{/images/kakao_logo.png}" 
+					th:href="@{/kakao/oauth}"
 					alt="kakao_logo"/> 카카오 로그인
 				</button>	
 			</div>
@@ -28,11 +29,11 @@
 			<div>
 				<img 
 				id="user_logo" 
-				src="images/user_logo.png" 
+				th:src="@{/images/user_logo.png}" 
 				alt="user_logo!"/>		
 				<img 
 				id="gift_logo"
-				src="images/gift_logo.png" 
+				th:src="@{/images/gift_logo.png}" 
 				alt="gift_logo!"/>					  
 			</div>
 			<div id="level_joins_name">
