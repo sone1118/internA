@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.contentree.interna.user.dto.HomeGetUserDetailRes;
 import com.contentree.interna.user.service.MypageService;
@@ -20,11 +21,12 @@ class LoginController {
 	
 	// [ 손혜진 ] go to login.html with error message
     @GetMapping("/")
-    public String home(@CookieValue(value = "refresh", required = false) String refresh, Model model) {
+    public String home(@RequestParam(value = "error", required = false) String error, @CookieValue(value = "refresh", required = false) String refresh, Model model) {
     	
     	if(refresh == null) {
         	log.info("refresh 쿠키가 없습니다. login으로 이동합니다.");
-    		return "login1";
+        	model.addAttribute("error_message", error);
+    		return "login";
     	}
     	else {
     		log.info("refresh 쿠키가 있습니다. home으로 이동합니다.");
@@ -40,12 +42,13 @@ class LoginController {
         		log.info("사용자 정보가 잘 받아졌습니다");
         		
         		model.addAttribute("user", user);
-        		return "home1";
+        		return "home";
         		
     		}catch(Exception e) {
     			System.out.println(e);
     			log.error("사용자 정보가 없습니다.");
-    			return "login1";
+    			model.addAttribute("error_message", "사용자 정보가 없습니다.");
+    			return "login";
     		}		
     	}
     }

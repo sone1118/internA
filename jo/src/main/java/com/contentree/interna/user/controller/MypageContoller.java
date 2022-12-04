@@ -26,7 +26,7 @@ class MypageControllerController {
     	
     	if(refresh == null) {
         	log.info("refresh 쿠키가 없습니다. login으로 이동합니다.");
-    		return "login1";
+    		return "login";
     	}
     	else {
     		log.info("refresh 쿠키가 있습니다. mypage으로 이동합니다.");
@@ -42,12 +42,12 @@ class MypageControllerController {
         		log.info("사용자 정보가 잘 받아졌습니다");
         		
         		model.addAttribute("user", user);
-        		return "mypage1";
+        		return "mypage";
         		
     		}catch(Exception e) {
     			System.out.println(e);
     			log.error("사용자 정보가 없습니다.");
-    			return "login1";
+    			return "login";
     		}		
     	}
     }

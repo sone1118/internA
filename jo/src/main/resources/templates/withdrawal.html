@@ -5,10 +5,29 @@
       layout:decorate="~{/layouts/layout}">
 	<th:block layout:fragment="content">
 		<div class="content1">
-		<div><h2>회원탈퇴를 하시려면 휴대전화 인증이 필요합니다.</h2></div>
-		<div><p>회원님의 개인정보 보호를 위한 절차이오니, JO! 회원 가입시 등록한 휴대전화를 입력해 주세요.</p></div>
-		<div><button id="phone_btn" type="button">휴대전화 인증</button></div>
-	</div>
-	<script type="text/javascript" th:src="@{/js/out.js}"></script>
+			<div><h2>회원탈퇴를 하시려면 휴대전화 인증이 필요합니다.</h2></div>
+			<div><p>회원님의 개인정보 보호를 위한 절차이오니, JO! 회원 가입시 등록한 휴대전화를 입력해 주세요.</p></div>
+			<div><button id="phone_btn" type="button">휴대전화 인증</button></div>
+			<div class="authenticate_bg1">
+				<div class="authenticate_close">X</div>
+				<div class="authenticate_wrap">
+					<div class="authenticate_contents">
+						<div><h3>휴대전화 인증</h3></div>
+						<div>
+							<form id="phone_form">
+								<div>
+									<input type="text" class="input_text" placeholder="Phone number here" autofocus/>
+								</div>
+								<div style="font-size: 0.7rem">가입시 등록한 휴대전화를 입력해 주세요.</div>
+								<div>
+									<button id="submit_btn" type="submit">인증번호 전송</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>	
+			</div>
+		<script type="text/javascript" th:src="@{/js/authenticate.js}"></script>
 	</th:block>
 </html>
