@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.contentree.interna.global.common.request.MypageSendEmailToJoinsReq;
 import com.contentree.interna.global.model.BaseResponseBody;
+import com.contentree.interna.global.model.BusinessException;
+import com.contentree.interna.global.model.ErrorCode;
 import com.contentree.interna.global.util.CookieUtil;
 import com.contentree.interna.global.util.JwtTokenUtil;
 import com.contentree.interna.global.util.MailUtil;
+import com.contentree.interna.user.dto.MypageCheckJoinsEmailCodeReq;
 import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.service.MypageService;
 
@@ -27,6 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,5 +68,40 @@ public class MypageContoller {
 			log.info("MypageContoller > mypageSendEmailToJoins - 성공 (joinsId : {}, userSeq : {})", joinsId, userSeq);
 			return BaseResponseBody.of(200, "이메일 전송 성공");
 		}
+    }
+	
+	// [ 김지슬 ] 임직원 인증 코드 검증 
+	@Tag(name="마이페이지")
+	@PostMapping("/check-joins")
+	@Operation(summary = "임직원 인증 코드 검증", description = "중앙 임직원 여부를 확인하기 위해 joins 이메일로 전송한 인증코드를 검사합니다.")
+	@ApiResponses({
+	        @ApiResponse(responseCode = "201", description = "임직원 인증 성공"),
+	        @ApiResponse(responseCode = "400", description = "인증 시간 만료"),
+	        @ApiResponse(responseCode = "400", description = "인증 코드 불일치"),
+	        @ApiResponse(responseCode = "400", description = "인증 실패 - 관리자에게 문의")
+	        })
+    public ResponseEntity<BaseResponseBody> checkJoinsEmailCode(@RequestBody MypageCheckJoinsEmailCodeReq mypageCheckJoinsEmailCodeReq, @ApiIgnore Principal principal) {
+		log.info("MypageContoller > checkJoinsEmailCode - 호출 (userSeq : {})", principal.getName());
+		
+		Long userSeq = Long.parseLong(principal.getName());
+		String certificationCode = mypageCheckJoinsEmailCodeReq.getCertificationCode();
+		
+		try {
+			boolean answerStatus = mypageService.checkJoinsEmailCode(userSeq, certificationCode);
+			if (answerStatus) {
+				log.info("MypageContoller > checkJoinsEmailCode - 인증 성공 (userSeq : {})", userSeq);
+				return ResponseEntity.status(201).body(BaseResponseBody.of(201, "임직원 인증 성공"));
+			}
+		} catch (BusinessException ex) {
+			ErrorCode errorCode = ex.getErrorCode();
+			if (errorCode == ErrorCode.TIME_OUT) {
+				return ResponseEntity.status(400).body(BaseResponseBody.of(400, "인증 시간 만료"));
+			} else if (errorCode == ErrorCode.WRONG_CERT_CODE) {
+				return ResponseEntity.status(400).body(BaseResponseBody.of(400, "인증 코드 불일치"));
+			}
+		}
+		
+		log.error("MypageContoller > checkJoinsEmailCode - 인증 실패 (userSeq : {}, certificationCode : {})", userSeq, certificationCode);
+		return ResponseEntity.status(400).body(BaseResponseBody.of(400, "인증 실패 - 관리자에게 문의"));
     }
 }
