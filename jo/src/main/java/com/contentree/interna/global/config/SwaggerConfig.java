@@ -60,5 +60,4 @@ public class SwaggerConfig {
     private ApiKey apiKey(String name, String keyName, String passAs) {
         return new ApiKey(name, keyName, passAs);
     }
-
 }

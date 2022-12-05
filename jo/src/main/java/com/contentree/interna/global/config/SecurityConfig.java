@@ -25,12 +25,12 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	
+
 	private final CustomAccessDeniedHandler customAccessDeniedHandler;
-	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint; 
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final JwtExceptionFilter jwtExceptionFilter;
-	
+
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring().antMatchers("/v2/api-docs", "/swagger*/**");

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layouts/layout}">
+	<th:block layout:fragment="content">
+		<div class="content1">
+			<div><h2>중앙그룹 임직원이신가요?</h2></div>
+			<div><p>중앙그릅 임직원 확인을 위해 이메일 인증을 진행합니다. 조인스 이메일 인증을 진행해 주세요.</p></div>
+			<div><button id="email_btn" type="button">이메일 인증</button></div>
+			
+			<div class="authenticate_bg1">
+				<div class="authenticate_close1">X</div>
+				<div class="authenticate_wrap">
+					<div class="authenticate_contents">
+						<div><h3>조인스 ID</h3></div>
+						<div>
+							<form id="email_form1" action="/api/users/send-joins">
+								<div>
+									<input type="text" name="joinsId" class="input_text1" placeholder="joins id here" required/><span> &#64;joins.net</span>
+								</div>
+								<div>
+									<button class="submit_btn" type="submit">인증번호 전송</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>						
+			<div class="authenticate_bg2">
+			<div class="authenticate_close2">X</div>
+				<div class="authenticate_wrap">
+					<div class="authenticate_contents">
+						<div><h3>인증번호</h3></div>
+						<div>
+							<form id="email_form2" action="/api/users/check-joins">
+								<div>
+									<input type="number" name="certificationNumber" min="1" class="input_text2" placeholder="input number here" required/>
+								</div>
+								<div><h3 id="timer"></h3></div>
+								<div><h3 id="error_message"></h3></div>
+								<div>
+									<button class="submit_btn" type="submit">확인</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>			
+		</div>
+		<script type="text/javascript" th:src="@{/js/email.js}"></script>
+	</th:block>
+</html>

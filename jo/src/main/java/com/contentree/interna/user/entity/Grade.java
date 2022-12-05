@@ -4,7 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum Grade {
-	BRONZE, 
-	SILVER, 
-	GOLD;
+	BRONZE, SILVER, GOLD;
+
+	public String toString() {
+		return this.name();
+	}
 }

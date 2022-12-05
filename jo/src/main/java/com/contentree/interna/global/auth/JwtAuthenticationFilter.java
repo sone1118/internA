@@ -51,10 +51,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${spring.security.jwt.refresh-token-expiration}")
     private int refreshTokenExpiration;
 
-    private final CustomUserDetailsService customUserDetailsService;
-    private final CookieUtil cookieUtil;
-    private final JwtTokenUtil jwtTokenUtil;
-    private final RedisUtil redisUtil;
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		String accessToken = request.getHeader(jwtTokenUtil.HEADER_STRING);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
