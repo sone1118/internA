@@ -183,6 +183,10 @@ h1 {
 	z-index: 6;
 }
 
+
+
+
+
 .authenticate_bg1, .authenticate_bg2  {
 	display: none;
 	width: 300px;
@@ -213,7 +217,7 @@ h1 {
     justify-content: center;
     align-items: center;
 }
-.authenticate_close {
+.authenticate_close1, .authenticate_close2 {
     position: absolute;
     right: 4px;
     top: -25px;
@@ -221,14 +225,14 @@ h1 {
     cursor: pointer;
     z-index: 6;
 }
-.input_text {
+.input_text1, .input_text2 {
     border: none;
     width: 140px;
     height: 30px;
     text-align: center;
     border-bottom: 1px solid black;
 }
-#submit_btn {
+.submit_btn {
     margin: 0;
     height: 30px;
     width: 230px;
@@ -244,12 +248,19 @@ h1 {
     cursor: pointer;
 }
 
-#phone_form, #email_form {
+#email_form1, #email_form2 {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 }
+
+
+
+
+
+
+
 
 
 #footer {

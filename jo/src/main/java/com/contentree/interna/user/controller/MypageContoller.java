@@ -38,6 +38,7 @@ class MypageControllerController {
     			MypageGetUserDetailRes user =  mypageService.getUserDetailWithStar(userSeq);
         		
         		//user가 없을경우 던져버림
+    			//최상위 클래스라 null이면 exception을 보내는걸로 바꾸기
         		if(user == null) throw new Exception();
         		log.info("사용자 정보가 잘 받아졌습니다");
         		

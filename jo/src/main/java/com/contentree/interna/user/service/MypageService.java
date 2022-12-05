@@ -70,10 +70,13 @@ public class MypageService {
 		return userDetail;
 	}
 	
+
+	//util로 빼서 static으로 하면
 	private String getGradeString(String grade) {
 		if(grade == "GOLD") return "G";
 		if(grade == "SILVER") return "S";
-		return "B";		
+		return "B";	
+		//"GOLD".equals(grade); true false로
 	}
 	
 	private Boolean todayIsBirthday(Calendar birth) {
