@@ -3,6 +3,8 @@ package com.contentree.interna.user.service;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +31,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * @author 이연희
+ *
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -115,7 +122,7 @@ public class UserService {
 			log.error("UserService > findProfile - Json 파싱 실패");
 			return null;
 		} catch (HttpClientErrorException e) {
-			log.error("UserService > findProfile - 잘못된 인가코드");
+			log.error("UserService > findProfile - 잘못된 토큰");
 			return null;
 		}
 	}
@@ -128,11 +135,10 @@ public class UserService {
 		Calendar cal = Calendar.getInstance();
 		int year = 1998;
 		String birth = profile.getKakao_account().getBirthday();
-		int month = Integer.parseInt(birth.substring(0, 3));
+		int month = Integer.parseInt(birth.substring(0, 2));
 		int day = Integer.parseInt(birth.substring(2));
-		cal.set(year, month, day);
+		cal.set(year, month - 1, day);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-
 		String prefixPhone = "0101234";
 		String userPhone = prefixPhone + birth;
 		User user = userRepository.findByUserPhone(userPhone);// 0101234 + 0122
@@ -167,7 +173,11 @@ public class UserService {
 		return userDto;
 	}
 
-	public String logout() {
-		return "";
+	public Boolean logout(HttpServletRequest request, Long userSeq) {
+		// 카카오 로그아웃
+		User user = userRepository.findById(userSeq).get();
+
+		return true;
 	}
+
 }
