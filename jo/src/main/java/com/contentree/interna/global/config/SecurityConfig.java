@@ -44,6 +44,7 @@ public class SecurityConfig {
 		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		// jwt 예외 프론트로 반환하기 위한 filter 적용
 		http.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
+
 		return http.build();
 	}
 }
