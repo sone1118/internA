@@ -2,10 +2,8 @@ package com.contentree.interna.user.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Optional;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.contentree.interna.global.util.CookieUtil;
 import com.contentree.interna.global.util.JwtTokenUtil;
+import com.contentree.interna.global.util.KakaoUtil;
 import com.contentree.interna.global.util.RedisUtil;
 import com.contentree.interna.user.dto.KakaoProfile;
 import com.contentree.interna.user.dto.OauthTokenDto;
@@ -48,6 +47,7 @@ public class UserService {
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RedisUtil redisUtil;
 	private final CookieUtil cookieUtil;
+	private final KakaoUtil kakaoUtil;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
 	private String client_id;
@@ -60,6 +60,9 @@ public class UserService {
 
 	@Value("${spring.cookie.refresh-cookie-name}")
 	private String refreshCookieName;
+
+	@Value("${spring.cookie.access-cookie-name}")
+	private String accessCookieName;
 
 	@Value("${spring.security.jwt.refresh-token-expiration}")
 	private Integer refreshTokenExpiration;
@@ -171,7 +174,7 @@ public class UserService {
 		String refreshToken = jwtTokenUtil.createRefreshToken();
 
 		// redis에 {refresh:userSeq} 저장
-		redisUtil.setDataWithExpire(refreshToken, Long.toString(user.getUserSeq()), 10000);
+		redisUtil.setDataWithExpire(refreshToken, Long.toString(user.getUserSeq()), refreshTokenExpiration);
 		log.info("UserService > SaveUserAndGetToken - redis에 저장 (refresh token : userSeq) = ({} : {})", refreshToken,
 				user.getUserSeq());
 		log.info("UserService > SaveUserAndGetToken - 토큰 저장 확인 {}:{}", redisUtil.getData(refreshToken));
@@ -184,7 +187,7 @@ public class UserService {
 		return userDto;
 	}
 
-	public Boolean logout(HttpServletRequest request, Long userSeq) {
+	public Boolean logout(Long userSeq) {
 		// 카카오 로그아웃
 		User user = userRepository.findById(userSeq).get();
 		Long kakaoId = user.getUserKakaoId();
@@ -192,79 +195,77 @@ public class UserService {
 			log.error("UserService > logout - 카카오 로그아웃 실패");
 			return false;
 		}
-		// access, refresh token 처리
-		Boolean completeDel = deleteToken(request);
-		if (completeDel == false) {
-			return false;
-		}
+
+		// TODO 카카오 서버 연결 해제
+		kakaoUtil.logout(kakaoId);
+
 		return true;
 	}
 
-	public Boolean deleteToken(HttpServletRequest request) {
-		Cookie refreshCookie = cookieUtil.getCookie(request, refreshCookieName);
-		String refreshToken = refreshCookie.getValue();
-
+	public boolean deleteToken(String refreshToken, String accessToken, HttpServletResponse response) {
 		try {
+			log.info("UserService > deleteToken - redis와 cookie에 있는 refresh 토큰 삭제 후 만료시간 0인 토큰 추가");
 			// redis에 있는 refresh token 삭제
-			redisUtil.deleteData(refreshToken);
+			redisUtil.deleteData(refreshToken);// key로 삭제
 
-			// cookie에 있는 refresh token 삭제
-			cookieUtil.removeCookie(refreshToken);
+			// cookie에 있는 refresh token 삭제 후 response에 밀어넣기
+			Cookie refreshCookie = cookieUtil.removeCookie(refreshCookieName);
+			Cookie accessCookie = cookieUtil.removeCookie(accessCookieName);
+			response.addCookie(refreshCookie);
+			response.addCookie(accessCookie);
 
 			// access token 블랙리스트 추가
-			String originAccessToken = request.getHeader(jwtTokenUtil.HEADER_STRING).replace(jwtTokenUtil.TOKEN_PREFIX,
-					"");
-			Integer tokenExpiration = jwtTokenUtil.getTokenExpirationAsLong(originAccessToken).intValue();
-			redisUtil.setDataWithExpire(originAccessToken, "B", tokenExpiration);
+			Integer tokenExpiration = jwtTokenUtil.getTokenExpirationAsInt(accessToken);
+			redisUtil.setDataWithExpire(accessToken, "B", tokenExpiration);
 		} catch (Exception e) {
 			log.error("UserService > deleteToken - 토큰 로그인 설정 실패");
 			return false;
 		}
 		return true;
 	}
-
-	public String reissueToken(HttpServletRequest request, HttpServletResponse response) {
-
-		String refreshToken = cookieUtil.getCookie(request, refreshCookieName).getValue();
-		if (refreshToken != null) {
-			String stringUserSeq = redisUtil.getData(refreshToken);
-			if (stringUserSeq != null) {
-				log.info("UserService > reissueToken - refresh token으로 acess token 생성");
-				Long userSeq = Long.valueOf(stringUserSeq);
-				Optional<User> isUserPresent = userRepository.findById(userSeq);
-				if (isUserPresent.isPresent()) {
-					// 1.access token 생성
-					String newAccessToken = jwtTokenUtil.createAccessToken(userSeq);
-
-					// 2.redis에 기존 refresh token 삭제
-					redisUtil.deleteData(refreshToken);
-
-					// 3.refresh token 재발급
-					String newRefreshToken = jwtTokenUtil.createRefreshToken();
-
-					// 4.new refresh token 쿠키에 저장
-					Cookie newRefreshCookie = cookieUtil.createCookie(newAccessToken, newRefreshToken);
-					response.addCookie(newRefreshCookie);
-
-					// 5.new refresh token을 redis에 저장
-					redisUtil.setDataWithExpire(newRefreshToken, stringUserSeq, refreshTokenExpiration);
-
-					// 6.기존 accesstoken 블랙리스트
-					String originAccessToken = request.getHeader(jwtTokenUtil.HEADER_STRING)
-							.replace(jwtTokenUtil.TOKEN_PREFIX, "");
-					Integer tokenExpiration = jwtTokenUtil.getTokenExpirationAsLong(originAccessToken).intValue();
-
-					redisUtil.setDataWithExpire(originAccessToken, "B", tokenExpiration);
-
-					return newAccessToken;
-				} else {
-					return "DB";
-				}
-			} else {
-				return "EXP";
-			}
-		}
-		return null;
-	}
+//
+//	public String reissueToken(HttpServletRequest request, HttpServletResponse response) {
+//
+//		String refreshToken = cookieUtil.getCookie(request, refreshCookieName).getValue();
+//		if (refreshToken != null) {
+//			String stringUserSeq = redisUtil.getData(refreshToken);
+//			if (stringUserSeq != null) {
+//				log.info("UserService > reissueToken - refresh token으로 acess token 생성");
+//				Long userSeq = Long.valueOf(stringUserSeq);
+//				Optional<User> isUserPresent = userRepository.findById(userSeq);
+//				if (isUserPresent.isPresent()) {
+//					// 1.access token 생성
+//					String newAccessToken = jwtTokenUtil.createAccessToken(userSeq);
+//
+//					// 2.redis에 기존 refresh token 삭제
+//					redisUtil.deleteData(refreshToken);
+//
+//					// 3.refresh token 재발급
+//					String newRefreshToken = jwtTokenUtil.createRefreshToken();
+//
+//					// 4.new refresh token 쿠키에 저장
+//					Cookie newRefreshCookie = cookieUtil.createCookie(newAccessToken, newRefreshToken);
+//					response.addCookie(newRefreshCookie);
+//
+//					// 5.new refresh token을 redis에 저장
+//					redisUtil.setDataWithExpire(newRefreshToken, stringUserSeq, refreshTokenExpiration);
+//
+//					// 6.기존 accesstoken 블랙리스트
+//					String originAccessToken = request.getHeader(jwtTokenUtil.HEADER_STRING)
+//							.replace(jwtTokenUtil.TOKEN_PREFIX, "");
+//					Integer tokenExpiration = jwtTokenUtil.getTokenExpirationAsLong(originAccessToken).intValue();
+//
+//					redisUtil.setDataWithExpire(originAccessToken, "B", tokenExpiration);
+//
+//					return newAccessToken;
+//				} else {
+//					return "DB";
+//				}
+//			} else {
+//				return "EXP";
+//			}
+//		}
+//		return null;
+//	}
 
 }

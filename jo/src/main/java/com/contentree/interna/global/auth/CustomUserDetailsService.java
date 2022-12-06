@@ -7,6 +7,11 @@ import org.springframework.stereotype.Service;
 import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.repository.UserRepository;
 
+/**
+ * 
+ * @author 김지슬
+ *
+ */
 @Service
 public class CustomUserDetailsService {
 
@@ -24,5 +29,4 @@ public class CustomUserDetailsService {
 		}
 		return null;
 	}
-
 }
