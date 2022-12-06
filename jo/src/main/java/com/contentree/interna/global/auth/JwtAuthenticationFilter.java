@@ -51,16 +51,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${spring.security.jwt.refresh-token-expiration}")
     private int refreshTokenExpiration;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		String accessToken = request.getHeader(jwtTokenUtil.HEADER_STRING);
+    private final RedisUtil redisUtil;
+    private final CookieUtil cookieUtil;
+    private final JwtTokenUtil jwtTokenUtil;
+    
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String refreshToken = null;
         String accessToken = null;
-        String userSeqString = null;
+        String refreshUserSeq = null;
         
     	try {
 	    	// < Refresh Token 검사 >
@@ -77,9 +78,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	        	}
 	        	
 	        	// 3. Redis에 존재하는지 확인 (Refresh Token이 블랙리스트 처리 되었는지 확인)
-	        	userSeqString = redisUtil.getData(refreshToken);
+	        	refreshUserSeq = redisUtil.getData(refreshToken);
 	        	// 3-1. 블랙리스트 처리 된 경우
-	        	if (userSeqString == null) {
+	        	if (refreshUserSeq == null) {
 	        		throw new BusinessException(ErrorCode.BLACK_REFRESH, refreshToken);
 	        	}
 	        
@@ -105,35 +106,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			            }
 			            
 		                // 5. Access Token에서 사용자 정보 추출
-		                Long userSeq = jwtTokenUtil.getUserSeq(accessToken);
+		                Long accessUserSeq = jwtTokenUtil.getUserSeq(accessToken);
 		                
 		                // 5-1. redis에 저장되어있는 유저 정보와 토큰에서 가져온 유저 정보가 다를 경우
-		                if (Long.parseLong(userSeqString) != userSeq) {
+		                if (Long.parseLong(refreshUserSeq) != accessUserSeq) {
 		                	StringBuilder builder = new StringBuilder();
 		                	builder.append("Refresh Token UserSeq : ");
-		                	builder.append(userSeqString);
+		                	builder.append(refreshUserSeq);
 		                	builder.append(", Access Token UserSeq : ");
-		                	builder.append(userSeq);
+		                	builder.append(accessUserSeq);
 		                	throw new BusinessException(ErrorCode.CREATOR_ERROR, builder.toString());
 		                }
 		                
 		                // 5-2. 토큰에서 유저 정보를 받아오지 못했을 경우
-		                if (userSeq == null) throw new IllegalArgumentException();
+		                if (accessUserSeq == null) throw new IllegalArgumentException();
 		
 		                // 6. Access Token 토큰에 포함된 유저 정보를 통해 실제 DB에 해당 정보의 계정이 있는지 조회
-		                User user = customUserDetailsService.getUserDetail(userSeq);
+		                User user = customUserDetailsService.getUserDetail(accessUserSeq);
 		                if (user != null) {
-		                    // 7. 토큰 유효성 검증
-		                    if (Boolean.TRUE.equals(jwtTokenUtil.validateToken(accessToken))) {
-		                        // 8. security 인증 객체 생성 
-		                    	createJwtAuthentication(userSeq, user);
-		                    }
+		                    // 8. security 인증 객체 생성 
+		                    createJwtAuthentication(accessUserSeq, user);
 		                } else { // 5-1. DB에 해당 유저 없는 경우
-		                    throw new BusinessException(ErrorCode.NONEXISTENT_USER, userSeqString);
+		                    throw new BusinessException(ErrorCode.NONEXISTENT_USER, refreshUserSeq);
 		                }
 			        }
 		        } else { // 1-2. Access Cookie 존재하지 않는 경우 (쿠키 만료) => 재발급
-		        	reissueToken(response, null, refreshToken, Long.parseLong(userSeqString));
+		        	reissueToken(response, refreshToken, Long.parseLong(refreshUserSeq));
 		        }
 	        }
         } catch (SignatureException ex) {
@@ -142,8 +140,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new MalformedJwtException(ex.getMessage());
         } catch (ExpiredJwtException ex) {
         	// Refresh Token이 유효할 경우에만 토큰 재발급 (Refresh Token 만료된 경우는 재로그인)
-        	if (refreshToken != null && userSeqString != null) {
-        		reissueToken(response, accessToken, refreshToken, Long.parseLong(userSeqString));
+        	if (refreshToken != null && refreshUserSeq != null) {
+        		reissueToken(response, refreshToken, Long.parseLong(refreshUserSeq));
         	}
         } catch (UnsupportedJwtException ex) {
             throw new UnsupportedJwtException(ex.getMessage());
@@ -154,16 +152,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     
     // 토큰 재발급 및 인증 객체 생성 
-    private HttpServletResponse reissueToken(HttpServletResponse response, String oldAccessToken, String oldRefreshToken, Long userSeq) {
+    private HttpServletResponse reissueToken(HttpServletResponse response, String oldRefreshToken, Long userSeq) {
     	log.info("JwtAuthenticationFilter - reissueToken 호출, (userSeq : {})", userSeq);
     	
-    	// 1. 토큰 블랙리스트 처리
-    	// 1-1. Access Token 유효한 경우, 블랙리스트로 등록 
-    	if (oldAccessToken != null) {
-        	int tokenExpirationAsInt = jwtTokenUtil.getTokenExpirationAsInt(oldAccessToken);
-        	redisUtil.setDataWithExpire(oldAccessToken, "B", tokenExpirationAsInt);
-    	}
-    	// 1-2. Refresh Token 삭제
+    	// 1. Refresh Token 삭제 (블랙 처리)
     	redisUtil.deleteData(oldRefreshToken);
     	
     	// 2. 토큰 새로 발급
