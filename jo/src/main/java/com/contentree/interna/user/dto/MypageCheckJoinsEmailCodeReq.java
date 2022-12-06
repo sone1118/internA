@@ -9,7 +9,7 @@ import lombok.Getter;
  *
  */
 @Getter
-public class MypageSendEmailToJoinsReq {
-	@Schema(description = "메일 인증 받을 조인스 아이디", example = "kim.jiseul")
-	String joinsId;
+public class MypageCheckJoinsEmailCodeReq {
+	@Schema(description = "이메일로 전달받은 8자리 코드", example = "EK3F1K0J")
+	String certificationCode;
 }

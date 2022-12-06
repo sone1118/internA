@@ -15,7 +15,10 @@ public enum ErrorCode {
 	// Mypage
 	ALREADY_CERTIFIED(400, "MYPAGE_001", "이미 인증된 임직원."),
 	ALREADY_USED(400, "MYPAGE_002", "이미 인증에 사용된 아이디"),
-	FAILED_TO_SEND_EMAIL(400, "MYPAGE_003", "이메일 전송 실패");
+	FAILED_TO_SEND_EMAIL(400, "MYPAGE_003", "이메일 전송 실패"),
+	
+	WRONG_CERT_CODE(400, "MYPAGE_004", "인증 코드 불일치"),
+	TIME_OUT(400, "MYPAGE_005", "인증 시간 초과");
 	
 	
  	private final int status;
