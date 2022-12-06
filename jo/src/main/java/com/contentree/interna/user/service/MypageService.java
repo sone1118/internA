@@ -42,7 +42,7 @@ public class MypageService {
 	private final RedisUtil redisUtil;
 	
 	// [ 김지슬 ] 임직원 인증 인증번호 전송
-	public Boolean sendEmailToJoins(Long userSeq, String joinsId) {
+	public void sendEmailToJoins(Long userSeq, String joinsId) {
 		log.info("MypageService > sendEmailToJoins - 호출 (userSeq : {})", userSeq);
 		
 		// 1. 이미 임직원 인증한 회원인지 확인
@@ -72,12 +72,11 @@ public class MypageService {
 		// 4. 인증번호 및 joins id Redis에 저장 
 		redisUtil.setDataWithExpire("cert-" + userSeq, randomCode, validationExpiration);
 		redisUtil.setDataWithExpire("joins-" + userSeq, joinsId, validationExpiration);
-		
-		return true;
 	}
 	
+	
 	// [ 김지슬 ] 임직원 인증 코드 검증 
-	public boolean checkJoinsEmailCode(Long userSeq, String certificationCode) {
+	public void checkJoinsEmailCode(Long userSeq, String certificationCode) {
 		String userSeqString = userSeq.toString();
 		log.info("MypageService > checkJoinsEmailCode - 호출 (userSeq : {}, certificationCode : {})", userSeqString, certificationCode);
 		
@@ -107,8 +106,6 @@ public class MypageService {
 		
 		// 4. userSeq로 저장된 joins id 데이터 삭제 
 		redisUtil.deleteData(joinsKey);
-		
-		return true;
 	}
 
 	// [ 손혜진 ] 회원 정보 가져오기
