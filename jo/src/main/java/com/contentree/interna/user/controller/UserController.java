@@ -104,36 +104,31 @@ public class UserController {
 	@DeleteMapping("/users")
 	@Operation(summary = "회원 탈퇴", description = "회원 정보를 회원 탈퇴 테이블로 넘깁니다.")
 	@ApiResponses({
-	        @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
-	        @ApiResponse(responseCode = "400", description = "회원 탈퇴 실패 - 관리자 확인 필요")
+	        @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공")
 	        })
 	public ResponseEntity<BaseResponseBody> removeUser(HttpServletRequest request, HttpServletResponse response, @ApiIgnore Principal principal) {
 		log.info("UserContoller > removeUser - 호출 (userSeq : {})", principal.getName());
 		Long userSeq = Long.parseLong(principal.getName());
 
 		// 1. 유저 정보 삭제 
-		boolean answerStatus = userService.removeUser(userSeq);
-		if (answerStatus) {
-			// 2. 토큰 블랙리스트 처리 
-			// 2-1. 각 토큰 쿠키에서 가져오기 (쿠키 및 쿠키 value의 null 처리는 jwtAuthenticationFilter에서 검증되었으므로 해당 과정 X)
-			String refreshToken = cookieUtil.getCookie(request, refreshCookieName).getValue();
-			String accessToken = cookieUtil.getCookie(request, accessCookieName).getValue();
-			
-			// 2-2. 각 토큰 블랙리스트 처리
-			userService.blackToken(refreshToken, accessToken);
-			
-			// 3. 쿠키 삭제
-			Cookie refreshDelCookie = cookieUtil.removeCookie(refreshCookieName);
-			Cookie accessDelCookie = cookieUtil.removeCookie(accessCookieName);
-			
-			response.addCookie(refreshDelCookie);
-			response.addCookie(accessDelCookie);
-			
-			log.info("UserContoller > removeUser - 회원 탈퇴 성공 (userSeq : {})", userSeq);
-			return ResponseEntity.status(200).body(BaseResponseBody.of(200, "회원 탈퇴 성공"));
-		}
+		userService.removeUser(userSeq);
 		
-		log.info("UserContoller > removeUser - 회원 탈퇴 실패 (userSeq : {})", userSeq);
-		return ResponseEntity.status(400).body(BaseResponseBody.of(400, "회원 탈퇴 실패 - 관리자 확인 필요"));
+		// 2. 토큰 블랙리스트 처리 
+		// 2-1. 각 토큰 쿠키에서 가져오기 (쿠키 및 쿠키 value의 null 처리는 jwtAuthenticationFilter에서 검증되었으므로 해당 과정 X)
+		String refreshToken = cookieUtil.getCookie(request, refreshCookieName).getValue();
+		String accessToken = cookieUtil.getCookie(request, accessCookieName).getValue();
+		
+		// 2-2. 각 토큰 블랙리스트 처리
+		userService.blackToken(refreshToken, accessToken);
+		
+		// 3. 쿠키 삭제
+		Cookie refreshDelCookie = cookieUtil.removeCookie(refreshCookieName);
+		Cookie accessDelCookie = cookieUtil.removeCookie(accessCookieName);
+		
+		response.addCookie(refreshDelCookie);
+		response.addCookie(accessDelCookie);
+		
+		log.info("UserContoller > removeUser - 회원 탈퇴 성공 (userSeq : {})", userSeq);
+		return ResponseEntity.status(200).body(BaseResponseBody.of(200, "회원 탈퇴 성공"));
 	}
 }

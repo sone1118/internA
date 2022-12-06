@@ -185,7 +185,7 @@ public class UserService {
 	
 	
 	// [ 김지슬 ] 회원 탈퇴 
-	public boolean removeUser(Long userSeq) {
+	public void removeUser(Long userSeq) {
 		log.info("UserService > removeUser - 호출 (userSeq : {})", userSeq);
 		// 1. userSeq로 User 객체 찾아오기
 		// (jwtAuthenticationFilter에서 해당 userSeq의 user 정보가 있는지 먼저 확인하기 때문에, 따로 검증 과정 X)
@@ -235,8 +235,6 @@ public class UserService {
 				
 		// 6. 카카오 연결 끊기
 		kakaoUtil.unlinkUser(user.getUserKakaoId());
-		
-		return true;
 	}
 	
 	
