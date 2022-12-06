@@ -16,12 +16,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * @author 김지슬
+ *
+ */
 @Slf4j
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
-        log.error("CustomAccessDeniedHandler - 접근 권한 없는 유저가 접근");
+        log.error("CustomAccessDeniedHandler - 호출 > 접근 권한 없는 유저가 접근");
         ObjectMapper objectMapper = new ObjectMapper();
 
         httpServletResponse.setStatus(403);

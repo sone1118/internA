@@ -16,7 +16,11 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
+/**
+ * 
+ * @author 김지슬
+ *
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,6 +37,8 @@ public class MailUtil {
     
     // 문자 + 숫자 인증 코드 생성
     public String createRandomCode() {
+    	log.info("MailUtil > createRandomCode - 호출");
+    	
         Random random = new Random(System.currentTimeMillis());
         int tablelength = characterTable.length;
         StringBuffer buf = new StringBuffer();

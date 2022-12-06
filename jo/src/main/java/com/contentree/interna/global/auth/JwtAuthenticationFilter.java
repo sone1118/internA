@@ -1,10 +1,10 @@
 package com.contentree.interna.global.auth;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.contentree.interna.global.model.BusinessException;
+import com.contentree.interna.global.model.ErrorCode;
 import com.contentree.interna.global.util.CookieUtil;
 import com.contentree.interna.global.util.JwtTokenUtil;
 import com.contentree.interna.global.util.RedisUtil;
@@ -27,68 +29,172 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * @author 김지슬
+ *
+ */
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
-	@Value("{spring.security.password-secret-key}")
+	@Value("${spring.security.password-secret-key}")
     private String passwordSecretKey;
 
-    @Value("{spring.cookie.refresh-token-name}")
-    private String refreshTokenName;
+    @Value("${spring.cookie.refresh-cookie-name}")
+    private String refreshCookieName;
+    
+    @Value("${spring.cookie.access-cookie-name}")
+    private String accessCookieName;
+    
+    @Value("${spring.security.jwt.refresh-token-expiration}")
+    private int refreshTokenExpiration;
 
-    private final CustomUserDetailsService customUserDetailsService;
-    private final CookieUtil cookieUtil;
-    private final JwtTokenUtil jwtTokenUtil;
-    private final RedisUtil redisUtil;
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		String accessToken = request.getHeader(jwtTokenUtil.HEADER_STRING);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = request.getHeader(jwtTokenUtil.HEADER_STRING);
+        String refreshToken = null;
+        String accessToken = null;
+        String userSeqString = null;
+        
+    	try {
+	    	// < Refresh Token 검사 >
+	    	// 1. Refresh Token이 담긴 쿠키 가져오기 
+	        Cookie refreshCookie = cookieUtil.getCookie(request, refreshCookieName);
 
-        // < Access Token 유효할 경우 >
-        if (accessToken != null) {
-            // 1. Access Token이 이미 재발급 되어서 redis에 블랙리스트로 들어가있는지 확인
-            String inBlackList = redisUtil.getData(accessToken.replace(jwtTokenUtil.TOKEN_PREFIX, ""));
-            if (inBlackList != null && inBlackList.equals("B")) {
-                throw new SecurityException("사용할 수 없는 토큰입니다.");
-            }
-            try {
-                // 2. Access Token에서 사용자 정보 추출
-                if (accessToken.isEmpty()) throw new IllegalArgumentException("토큰이 존재하지 않습니다");
-                Long userSeq = jwtTokenUtil.getUserSeq(accessToken);
-                if (userSeq == null) {throw new IllegalArgumentException("정보가 담겨있지 않은 빈 토큰입니다.");}
-
-                // 3. Access Token 토큰에 포함된 유저 정보를 통해 실제 DB에 해당 정보의 계정이 있는지 조회
-                User user = customUserDetailsService.getUserDetail(userSeq);
-                if (user != null) {
-                    // 4. 토큰 유효성 검증
-                    if (jwtTokenUtil.validateToken(accessToken)) {
-                        // 4-1. 식별된 정상 유저인 경우, 요청 context 내에서 참조 가능한 인증 정보(jwtAuthentication) 생성
-                        UsernamePasswordAuthenticationToken jwtAuthentication = new UsernamePasswordAuthenticationToken(userSeq,
-                                userSeq + passwordSecretKey, AuthorityUtils.createAuthorityList(user.getUserRole().name()));
-
-                        // 4-2. jwt 토큰으로 부터 획득한 인증 정보(authentication) 설정
-                        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
-                    }
-                } else {    // DB에 해당 유저 없는 경우
-                    throw new NullPointerException("존재하지 않는 유저입니다.");
-                }
-            } catch (SignatureException ex) {
-                throw new SignatureException("유효하지 않은 JWT 서명입니다.");
-            } catch (MalformedJwtException ex) {
-                throw new MalformedJwtException("올바르지 않은 JWT 토큰입니다.");
-            } catch (ExpiredJwtException ex) {
-                throw new NullPointerException("만료된 JWT 토큰입니다.");
-            } catch (UnsupportedJwtException ex) {
-                throw new UnsupportedJwtException("지원하지 않는 형식의 JWT 토큰입니다.");
-            } catch (IllegalArgumentException ex) {
-                throw new IllegalArgumentException("정보가 담겨있지 않은 빈 토큰입니다.");
-            } catch (Exception ex) {
-                log.error("올바르지 않은 JWT 토큰입니다. - Exception");
-            }
+	        // 1-1. Refresh Cookie가 존재할 경우 (존재하지 않으면 authentcatioEntryPoint에서 처리)
+	        if (refreshCookie != null) {
+	        	refreshToken = refreshCookie.getValue();
+	        	
+	        	// 2. Refresh Token 유효성 검사 
+	        	if (refreshToken != null) {	// 쿠키의 value 값 있는 경우 
+	        		jwtTokenUtil.validateToken(refreshToken);
+	        	}
+	        	
+	        	// 3. Redis에 존재하는지 확인 (Refresh Token이 블랙리스트 처리 되었는지 확인)
+	        	userSeqString = redisUtil.getData(refreshToken);
+	        	// 3-1. 블랙리스트 처리 된 경우
+	        	if (userSeqString == null) {
+	        		throw new BusinessException(ErrorCode.BLACK_REFRESH, refreshToken);
+	        	}
+	        
+		        // < Access Token 검사 >
+		        // 1. Access Token이 담긴 쿠키 가져오기 
+		        Cookie accessCookie = cookieUtil.getCookie(request, accessCookieName);
+		        
+		        // 1-1. Access Cookie가 존재할 경우
+		        if (accessCookie != null) {
+		        	accessToken = accessCookie.getValue();
+		        
+			        // 2. Access Token 가져오기 
+		        	// 2-1. Access Token 존재하는 경우 
+			        if (accessToken != null) {	
+			        	// 3. Access Token 유효성 검사
+			        	jwtTokenUtil.validateToken(accessToken);
+			        	
+			            // 4. Access Token이 이미 재발급 되어서 redis에 블랙리스트로 들어가있는지 확인
+			            String inBlackList = redisUtil.getData(accessToken.replace(jwtTokenUtil.TOKEN_PREFIX, ""));
+			            // 4-1. 블랙리스트 처리 되어있는 경우
+			        	if (inBlackList != null && inBlackList.equals("B")) {
+			                throw new BusinessException(ErrorCode.BLACK_ACCESS, accessToken);
+			            }
+			            
+		                // 5. Access Token에서 사용자 정보 추출
+		                Long userSeq = jwtTokenUtil.getUserSeq(accessToken);
+		                
+		                // 5-1. redis에 저장되어있는 유저 정보와 토큰에서 가져온 유저 정보가 다를 경우
+		                if (Long.parseLong(userSeqString) != userSeq) {
+		                	StringBuilder builder = new StringBuilder();
+		                	builder.append("Refresh Token UserSeq : ");
+		                	builder.append(userSeqString);
+		                	builder.append(", Access Token UserSeq : ");
+		                	builder.append(userSeq);
+		                	throw new BusinessException(ErrorCode.CREATOR_ERROR, builder.toString());
+		                }
+		                
+		                // 5-2. 토큰에서 유저 정보를 받아오지 못했을 경우
+		                if (userSeq == null) throw new IllegalArgumentException();
+		
+		                // 6. Access Token 토큰에 포함된 유저 정보를 통해 실제 DB에 해당 정보의 계정이 있는지 조회
+		                User user = customUserDetailsService.getUserDetail(userSeq);
+		                if (user != null) {
+		                    // 7. 토큰 유효성 검증
+		                    if (Boolean.TRUE.equals(jwtTokenUtil.validateToken(accessToken))) {
+		                        // 8. security 인증 객체 생성 
+		                    	createJwtAuthentication(userSeq, user);
+		                    }
+		                } else { // 5-1. DB에 해당 유저 없는 경우
+		                    throw new BusinessException(ErrorCode.NONEXISTENT_USER, userSeqString);
+		                }
+			        }
+		        } else { // 1-2. Access Cookie 존재하지 않는 경우 (쿠키 만료) => 재발급
+		        	reissueToken(response, null, refreshToken, Long.parseLong(userSeqString));
+		        }
+	        }
+        } catch (SignatureException ex) {
+            throw new SignatureException(ex.getMessage());
+        } catch (MalformedJwtException ex) {
+            throw new MalformedJwtException(ex.getMessage());
+        } catch (ExpiredJwtException ex) {
+        	// Refresh Token이 유효할 경우에만 토큰 재발급 (Refresh Token 만료된 경우는 재로그인)
+        	if (refreshToken != null && userSeqString != null) {
+        		reissueToken(response, accessToken, refreshToken, Long.parseLong(userSeqString));
+        	}
+        } catch (UnsupportedJwtException ex) {
+            throw new UnsupportedJwtException(ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(ex.getMessage());
         }
-        filterChain.doFilter(request, response);
+    	filterChain.doFilter(request, response);
+    }
+    
+    // 토큰 재발급 및 인증 객체 생성 
+    private HttpServletResponse reissueToken(HttpServletResponse response, String oldAccessToken, String oldRefreshToken, Long userSeq) {
+    	log.info("JwtAuthenticationFilter - reissueToken 호출, (userSeq : {})", userSeq);
+    	
+    	// 1. 토큰 블랙리스트 처리
+    	// 1-1. Access Token 유효한 경우, 블랙리스트로 등록 
+    	if (oldAccessToken != null) {
+        	int tokenExpirationAsInt = jwtTokenUtil.getTokenExpirationAsInt(oldAccessToken);
+        	redisUtil.setDataWithExpire(oldAccessToken, "B", tokenExpirationAsInt);
+    	}
+    	// 1-2. Refresh Token 삭제
+    	redisUtil.deleteData(oldRefreshToken);
+    	
+    	// 2. 토큰 새로 발급
+    	String newAccessToken = jwtTokenUtil.createAccessToken(userSeq);
+    	String newRefreshToken = jwtTokenUtil.createRefreshToken();
+    	
+    	// 3. 새 Refresh Token을 Redis 저장
+    	redisUtil.setDataWithExpire(newRefreshToken, userSeq.toString(), refreshTokenExpiration);
+    	
+    	// 4. 새 토큰 쿠키에 저장
+    	response.addCookie(cookieUtil.createCookie(accessCookieName, newAccessToken));
+    	response.addCookie(cookieUtil.createCookie(refreshCookieName, newRefreshToken));
+    	
+    	// 5. 유저 정보 가져오기 
+    	User user = customUserDetailsService.getUserDetail(userSeq);
+    	// 5-1. 유저 정보 없는 경우 
+    	if (user == null) throw new BusinessException(ErrorCode.NONEXISTENT_USER, userSeq.toString());
+    	
+    	// 6. security 인증 객체 생성
+    	createJwtAuthentication(userSeq, user);
+    	
+    	return response;
+    }
+    
+    // Security 인증 객체 생성 
+    private void createJwtAuthentication(Long userSeq, User user) {
+    	// 1. 요청 context 내에서 참조 가능한 인증 정보(jwtAuthentication) 생성
+        UsernamePasswordAuthenticationToken jwtAuthentication = new UsernamePasswordAuthenticationToken(userSeq,
+                userSeq + passwordSecretKey, AuthorityUtils.createAuthorityList(user.getUserRole().name()));
+
+        // 2. jwt 토큰으로 부터 획득한 인증 정보(authentication) 설정
+        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
     }
 }
