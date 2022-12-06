@@ -4,6 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 
+ * @author 김지슬
+ *
+ */
 @Getter
 @Setter
 @Schema(description = "Base Response body")
