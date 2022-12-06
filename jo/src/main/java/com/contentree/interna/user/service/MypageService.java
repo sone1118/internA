@@ -15,6 +15,7 @@ import com.contentree.interna.global.util.RedisUtil;
 import com.contentree.interna.user.dto.HomeGetUserDetailRes;
 import com.contentree.interna.user.dto.MypageGetUserDetailRes;
 import com.contentree.interna.user.entity.Joins;
+import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.repository.JoinsRepository;
 import com.contentree.interna.user.repository.UserRepository;
@@ -101,13 +102,19 @@ public class MypageService {
 		String joinsKey = "joins-" + userSeqString;
 		String joinsId = redisUtil.getData(joinsKey);
 		log.info("MypageService > checkJoinsEmailCode - 저장된 joins id 가져오기 (userSeq : {}, joinsId : {})", userSeqString, joinsId);
+		
 		Joins joins = Joins.builder().userSeq(userSeq).joinsId(joinsId).build();
 		joinsRepository.save(joins);
 		
 		// 4. userSeq로 저장된 joins id 데이터 삭제 
 		redisUtil.deleteData(joinsKey);
+		
+		// 5. user Role Joins로 변경
+		userRepository.updateUserRole(userSeq, Role.ROLE_JOINS);
+		log.info("MypageService > checkJoinsEmailCode - user role 업데이트 성공 (userSeq : {}, 변경된 userRole : {})", userSeq, "ROLE_JOINS");
 	}
 
+	
 	// [ 손혜진 ] 회원 정보 가져오기
 	public HomeGetUserDetailRes getUserDetail(Long userSeq) {
 		//유저 정보 가져오기
