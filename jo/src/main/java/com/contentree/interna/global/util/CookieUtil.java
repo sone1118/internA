@@ -3,31 +3,43 @@ package com.contentree.interna.global.util;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * @author 김지슬
+ *
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class CookieUtil {
 
-    private Integer refreshTokenExpiration;
-    
-    @Autowired
-    public CookieUtil(@Value("${spring.security.jwt.refresh-token-expiration}") Integer refreshTokenExpiration) {
-		this.refreshTokenExpiration = refreshTokenExpiration / 1000; // 초단위
-	}
+	@Value("${spring.security.jwt.access-token-expiration}")
+	private int accessTokenExpiration;
+	
+	@Value("${spring.security.jwt.refresh-token-expiration}")
+    private int refreshTokenExpiration;
 
     public Cookie createCookie(String cookieName, String value){
     	log.info("CookieUtil > createCookie - 호출 (구울 쿠키 이름 : {}, 값 : {}", cookieName, value);
+    	
+    	int expiration;
+    	if (cookieName.charAt(0) == 'a') {
+    		expiration = accessTokenExpiration / 1000;
+    	} else {
+    		expiration = refreshTokenExpiration / 1000;
+    	}
+    	
         Cookie cookie = new Cookie(cookieName,value);
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(refreshTokenExpiration);
+        cookie.setMaxAge(expiration);
         cookie.setPath("/");
+        
         return cookie;
     }
 
