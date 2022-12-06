@@ -65,8 +65,10 @@ public class MypageService {
 			throw new BusinessException(ErrorCode.FAILED_TO_SEND_EMAIL, "이메일 전송에 실패하였습니다.");
 		}
 		
-		// 4. 인증번호 레디스에 저장 
-		redisUtil.setDataWithExpire("joins-" + joinsId, randomCode, validationExpiration);
+		// 4. 인증번호 및 joins id Redis에 저장 
+		redisUtil.setDataWithExpire("cert-" + userSeq, randomCode, validationExpiration);
+		redisUtil.setDataWithExpire("joins-" + userSeq, joinsId, validationExpiration);
+		
 		return true;
 	}
 		
