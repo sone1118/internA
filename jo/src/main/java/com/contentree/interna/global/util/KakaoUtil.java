@@ -33,6 +33,8 @@ public class KakaoUtil {
 		JSONObject body = new JSONObject(response.getBody());
 		Long resKakaoId = body.getLong("id");
 		log.info("KakaoUtil > unlinkUser - 카카오에서 응답 받은 KakaoId:{}", resKakaoId);
+		
+		return resKakaoId;
 	}
 		
 	public Long logout(Long userKakaoId) {

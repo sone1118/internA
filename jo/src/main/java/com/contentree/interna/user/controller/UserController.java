@@ -9,15 +9,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.contentree.interna.global.model.BaseResponseBody;
 import com.contentree.interna.global.util.CookieUtil;
-import com.contentree.interna.global.util.RedisUtil;
 import com.contentree.interna.user.dto.OauthTokenDto;
 import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
 import com.contentree.interna.user.dto.UserGetLoginRes;
@@ -51,7 +50,7 @@ public class UserController {
 	private final UserService userService;
 	
 	private final CookieUtil cookieUtil;
-	private final RedisUtil redisUtil;
+	
 
 	// [ 이연희 ] 로그인, 회원가입, 토큰 발급 컨트롤러
 	// 프론트에서 인가코드 돌려 받는 주소
