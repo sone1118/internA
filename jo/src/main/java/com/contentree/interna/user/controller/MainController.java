@@ -1,5 +1,7 @@
 package com.contentree.interna.user.controller;
 
+import java.security.Principal;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.contentree.interna.user.dto.HomeGetUserDetailRes;
 import com.contentree.interna.user.dto.MypageGetUserDetailRes;
 import com.contentree.interna.user.service.MypageService;
+import com.contentree.interna.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class MainController {
 	
+	private final UserService userService;
 	private final MypageService mypageService;
 	
 	// [ 손혜진 ] go to login.html with error message
@@ -87,7 +91,7 @@ public class MainController {
     	}
     }
     
- // [ 손헤진 ] go to withdrawal.html
+ // [ 손헤진  ] go to withdrawal.html
     @GetMapping("/withdrawal")
     public String joins(@CookieValue(value = "refresh", required = false) String refresh, Model model) {
 
@@ -113,5 +117,14 @@ public class MainController {
     	else {
     		return "joins";
     	}   
+    }
+    
+ // [ 김지슬 ] go to megabox.html
+    @GetMapping("/megabox")
+    public String megabox(Principal principal, Model model) {
+    	String userName = userService.getUserName(Long.parseLong(principal.getName()));
+    	
+    	model.addAttribute("userName", userName);
+    	return "megabox";
     }
 }

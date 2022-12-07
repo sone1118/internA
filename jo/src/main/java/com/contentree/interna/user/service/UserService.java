@@ -291,6 +291,15 @@ public class UserService {
 	}
 	
 	
+	// [ 김지슬 ] 유저 이름 조회
+	public String getUserName(Long userSeq) {
+		// 유저 정보 조회
+		User user = userRepository.findById(userSeq).get();
+		
+		return user.getUserName();
+	}
+	
+	
 	// [ 김지슬 ] 토큰 블랙리스트 처리 
 	public void blackToken(String refreshToken, String accessToken) {
 		// refresh token redis에서 삭제

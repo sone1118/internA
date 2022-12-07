@@ -1,0 +1,42 @@
+@charset "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Poppins", sans-serif;
+}
+
+body {
+	width: 100%;
+    height: 100%;
+}
+
+#megabox-ad {
+    background-size: cover;
+    width: 100vw;
+    height: 10vh;
+}
+
+#welcome-box {
+	color: #888888;
+	background-color: black;
+	width: 30vw;
+	height: 30px;
+	
+	display: flex;
+	
+	padding-top: 10px;
+	float: right;
+}
+
+
+#megabox {
+    background-size: cover;
+    width: 100vw;
+    height: 90vh;
+	
+	position: relative;
+	z-index:-100;
+}
+
