@@ -1,0 +1,59 @@
+@charset "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Poppins", sans-serif;
+}
+
+body {
+	width: 100%;
+    height: 100%;
+}
+
+#ad {
+    background-size: cover;
+    width: 100vw;
+    height: 10vh;
+}
+
+#main {
+    background-size: cover;
+    width: 100vw;
+    height: 90vh;
+	
+	position: relative;
+	z-index:-100;
+}
+
+#megabox-welcome-box {
+	color: #888888;
+	background-color: black;
+	width: 30vw;
+	height: 30px;
+	
+	display: flex;
+	
+	margin-top: 10px;
+	float: right;
+}
+
+#phoenix-welcome-box {
+	color: white;
+	background-color: #1a2060;
+	width: 20vw;
+	height: 90px;
+	
+	display: flex;
+	
+	padding-top: 30px;
+	float: right;
+}
+
+#phoenix-welcome-box div {
+	font-weight: bold;
+	font-size: 15px;
+}
+
+

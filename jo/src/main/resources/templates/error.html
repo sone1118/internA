@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>ERROR</title>
+	<th:block th:replace="fragments/config::config"></th:bloc>
+</head>
+	<div class="content1">
+		<h1>Oops!</h1>
+		<div id="error-content">
+	        <div th:text="${code}" id="error-code"></div>
+	        <div th:text="${msg}" id="error-message"></div>
+	    </div>
+		<button type="button" 
+			id="home-button"
+			th:onclick="|location.href='@{/}'|"
+			>홈으로 돌아가기</button>
+	</div>
+</html>
