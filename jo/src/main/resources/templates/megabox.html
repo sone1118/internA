@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>megabox</title>
+		<link th:href="@{/css/joongang.css}" rel="stylesheet" />
+	</head>
+	<body>
+		<div id="ad" th:style="'background-image:url('+ @{/images/megabox_ad.png} +');'"></div>
+		<div id="megabox-welcome-box">
+			<div th:text="${userName}"></div>
+			<div>님 환영합니다.</div>
+		</div>
+		<div id="main" th:style="'background-image:url('+ @{/images/megabox_main.png} +');'"></div>
+	</body>
+</html>

@@ -2,11 +2,8 @@ package com.contentree.interna.user.controller;
 
 import java.security.Principal;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,14 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.contentree.interna.global.model.BaseResponseBody;
 import com.contentree.interna.global.model.BusinessException;
 import com.contentree.interna.global.model.ErrorCode;
-import com.contentree.interna.global.util.CookieUtil;
-import com.contentree.interna.global.util.JwtTokenUtil;
-import com.contentree.interna.global.util.RedisUtil;
 import com.contentree.interna.user.dto.MypageCheckJoinsEmailCodeReq;
 import com.contentree.interna.user.dto.MypageSendEmailToJoinsReq;
 import com.contentree.interna.user.service.MypageService;
 
-import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -45,9 +38,6 @@ public class MypageContoller {
 	
 	private final MypageService mypageService;
 	
-	private final JwtTokenUtil jwtTokenUtil;
-	private final CookieUtil cookieUtil;
-	private final RedisUtil redisUtil;
 	
 	// [ 김지슬 ] 임직원 인증 코드 전송
 	@Tag(name="마이페이지")
@@ -110,25 +100,5 @@ public class MypageContoller {
 		
 		log.info("MypageContoller > checkJoinsEmailCode - 인증 성공 (userSeq : {})", userSeq);
 		return ResponseEntity.status(201).body(BaseResponseBody.of(201, "임직원 인증 성공"));
-    }
-	
-	@Tag(name="마이페이지")
-	@GetMapping("/login")
-	@Operation(summary = "로그인테스트", description = "중앙 임직원 여부를 확인하기 위해 joins 이메일에 인증 코드를 전송합니다.")
-	@ApiResponses({
-	        @ApiResponse(responseCode = "200", description = "이메일 전송 성공"),
-	        @ApiResponse(responseCode = "400", description = "이메일 전송 실패")
-	        })
-    public ResponseEntity<BaseResponseBody> login(HttpServletResponse response) {
-		log.info("sendEmailForJoins - 호출");
-		String token = jwtTokenUtil.createAccessToken(3);
-		String retString = jwtTokenUtil.createRefreshToken();
-		response.addCookie(cookieUtil.createCookie("re-auth", retString));
-		response.addCookie(cookieUtil.createCookie("auth", token));
-		
-		redisUtil.setDataWithExpire(retString, "3", 2109600000);
-		
-		return ResponseEntity.status(200).body(BaseResponseBody.of(200, "wow"));
-
     }
 }

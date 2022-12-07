@@ -15,6 +15,7 @@ import com.contentree.interna.global.util.CookieUtil;
 import com.contentree.interna.user.dto.HomeGetUserDetailRes;
 import com.contentree.interna.user.dto.MypageGetUserDetailRes;
 import com.contentree.interna.user.service.MypageService;
+import com.contentree.interna.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +28,12 @@ public class MainController {
 	@Value("${spring.cookie.refresh-cookie-name}")
     private String refreshCookieName;
 	
+	private final UserService userService;
 	private final MypageService mypageService;
 	
 	private final CookieUtil cookieUtil;
 	
+
 	// [ 손혜진 ] go to login.html with error message
     @GetMapping("/")
     public String home(@RequestParam(value = "error", required = false) String error, HttpServletRequest request,
@@ -68,6 +71,7 @@ public class MainController {
 		}		
     }
     
+
  // [ 손헤진 ] go to mypage.html
     @GetMapping("/mypage")
     public String home(HttpServletRequest request, Principal principal, Model model) {
@@ -93,7 +97,8 @@ public class MainController {
     	
     }
     
- // [ 손헤진 ] go to withdrawal.html
+
+ // [ 손헤진  ] go to withdrawal.html
     @GetMapping("/withdrawal")
     public String joins(HttpServletRequest request, Principal principal, Model model) {
     	//1. 쿠키가 없으면 login 시큐리티가 걸러줄것
@@ -101,6 +106,7 @@ public class MainController {
     	return "withdrawal";  	
     }
     
+
 	// [ 손헤진 ] go to withdrawalLast.html
     @GetMapping("/withdrawalLast")
     public String withdrawalLast(HttpServletRequest request, Principal principal, Model model) {
@@ -111,6 +117,7 @@ public class MainController {
     	return "withdrawalLast";   
     }
     
+
 	// [ 손헤진 ] go to joins.html
     @GetMapping("/joins")
     public String withdrawal(HttpServletRequest request, Principal principal, Model model) {
@@ -137,4 +144,23 @@ public class MainController {
     	}
     }
 
+    
+ // [ 김지슬 ] go to megabox.html
+    @GetMapping("/megabox")
+    public String megabox(Principal principal, Model model) {
+    	String userName = userService.getUserName(Long.parseLong(principal.getName()));
+    	
+    	model.addAttribute("userName", userName);
+    	return "megabox";
+    }
+    
+
+ // [ 김지슬 ] go to megabox.html
+    @GetMapping("/phoenix")
+    public String phoenix(Principal principal, Model model) {
+    	String userName = userService.getUserName(Long.parseLong(principal.getName()));
+    	
+    	model.addAttribute("userName", userName);
+    	return "phoenix";
+    }
 }
