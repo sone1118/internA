@@ -59,7 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String refreshToken = null;
+    	
+    	String refreshToken = null;
         String accessToken = null;
         String refreshUserSeq = null;
         
@@ -83,7 +84,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	        	if (refreshUserSeq == null) {
 	        		throw new BusinessException(ErrorCode.BLACK_REFRESH, refreshToken);
 	        	}
-	        
+	        	
+	            log.info("JwtAuthenticationFilter > doFilterInternal - Refresh Token 검사 완료 (userSeq : {})", refreshUserSeq);
+	            
 		        // < Access Token 검사 >
 		        // 1. Access Token이 담긴 쿠키 가져오기 
 		        Cookie accessCookie = cookieUtil.getCookie(request, accessCookieName);
@@ -124,6 +127,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		                // 6. Access Token 토큰에 포함된 유저 정보를 통해 실제 DB에 해당 정보의 계정이 있는지 조회
 		                User user = customUserDetailsService.getUserDetail(accessUserSeq);
 		                if (user != null) {
+		                	log.info("JwtAuthenticationFilter > doFilterInternal - Access Token 검사 완료 (userSeq : {})", refreshUserSeq);
 		                    // 8. security 인증 객체 생성 
 		                    createJwtAuthentication(accessUserSeq, user);
 		                } else { // 5-1. DB에 해당 유저 없는 경우
@@ -148,12 +152,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException(ex.getMessage());
         }
+    	
     	filterChain.doFilter(request, response);
     }
     
     // 토큰 재발급 및 인증 객체 생성 
     private HttpServletResponse reissueToken(HttpServletResponse response, String oldRefreshToken, Long userSeq) {
-    	log.info("JwtAuthenticationFilter - reissueToken 호출, (userSeq : {})", userSeq);
+    	log.info("JwtAuthenticationFilter > reissueToken - 호출 (Access Token 재발급), (userSeq : {})", userSeq);
     	
     	// 1. Refresh Token 삭제 (블랙 처리)
     	redisUtil.deleteData(oldRefreshToken);
@@ -164,24 +169,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     	
     	// 3. 새 Refresh Token을 Redis 저장
     	redisUtil.setDataWithExpire(newRefreshToken, userSeq.toString(), refreshTokenExpiration);
+
+    	// 4. 유저 정보 가져오기 
+    	User user = customUserDetailsService.getUserDetail(userSeq);
+    	// 4-1. 유저 정보 없는 경우 
+    	if (user == null) throw new BusinessException(ErrorCode.NONEXISTENT_USER, userSeq.toString());
     	
-    	// 4. 새 토큰 쿠키에 저장
+    	// 5. security 인증 객체 생성
+    	createJwtAuthentication(userSeq, user);
+    	
+    	// 6. 새 토큰 쿠키에 저장
     	response.addCookie(cookieUtil.createCookie(accessCookieName, newAccessToken));
     	response.addCookie(cookieUtil.createCookie(refreshCookieName, newRefreshToken));
     	
-    	// 5. 유저 정보 가져오기 
-    	User user = customUserDetailsService.getUserDetail(userSeq);
-    	// 5-1. 유저 정보 없는 경우 
-    	if (user == null) throw new BusinessException(ErrorCode.NONEXISTENT_USER, userSeq.toString());
-    	
-    	// 6. security 인증 객체 생성
-    	createJwtAuthentication(userSeq, user);
+    	log.info("JwtAuthenticationFilter > reissueToken - 토큰 재발급 완료 (Access Token 재발급), (userSeq : {}, new access token : {}, new refresh token : {})", userSeq, newAccessToken, newRefreshToken);
     	
     	return response;
     }
     
     // Security 인증 객체 생성 
     private void createJwtAuthentication(Long userSeq, User user) {
+    	log.info("JwtAuthenticationFilter > createJwtAuthentication - 호출, security 인증 정보 생성 (userSeq : {}, userRole : {})", userSeq, user.getUserRole().name());
     	// 1. 요청 context 내에서 참조 가능한 인증 정보(jwtAuthentication) 생성
         UsernamePasswordAuthenticationToken jwtAuthentication = new UsernamePasswordAuthenticationToken(userSeq,
                 userSeq + passwordSecretKey, AuthorityUtils.createAuthorityList(user.getUserRole().name()));
