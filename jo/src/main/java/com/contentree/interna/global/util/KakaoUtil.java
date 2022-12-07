@@ -33,7 +33,19 @@ public class KakaoUtil {
 		JSONObject body = new JSONObject(response.getBody());
 		Long resKakaoId = body.getLong("id");
 		log.info("KakaoUtil > unlinkUser - 카카오에서 응답 받은 KakaoId:{}", resKakaoId);
+	}
 		
+	public Long logout(Long userKakaoId) {
+		log.info("KakaoUtil > logout - 카카오 로그인 연결 해제 (userKakaoId : {})", userKakaoId);
+		// 카카오에 요청 보내기
+		ResponseEntity<String> response = requestToKakaoByAK(userKakaoId, "v1/user/logout");
+
+		// 응답받은 id값 가져오기
+		JSONObject body = new JSONObject(response.getBody());
+		Long resKakaoId = body.getLong("id");
+
+		log.info("KakaoUtil > logout - 카카오에서 응답 받은 KakaoId:{}", resKakaoId);
+
 		return resKakaoId;
 	}
 
@@ -57,7 +69,7 @@ public class KakaoUtil {
 		// Http 요청하기 - Post방식으로 - 그리고 response 변수의 응답 받음.
 		ResponseEntity<String> response = rt.exchange("https://kapi.kakao.com/" + requestUrl, HttpMethod.POST,
 				kakaoAKRequest, String.class);
-		
+
 		return response;
 	}
 }
