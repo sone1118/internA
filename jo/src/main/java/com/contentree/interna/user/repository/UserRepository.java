@@ -5,9 +5,11 @@ import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
+
 
 @Transactional
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -16,6 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE User user SET user.userRole = :userRole WHERE user.userSeq = :userSeq")
-	int updateUserRole(Long userSeq, Role userRole);
+	int updateUserRole(@Param("userSeq") Long userSeq, @Param("userRole") Role userRole);
 	
 }

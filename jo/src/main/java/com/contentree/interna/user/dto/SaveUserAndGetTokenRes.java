@@ -1,5 +1,7 @@
 package com.contentree.interna.user.dto;
 
+import java.util.Calendar;
+
 import com.contentree.interna.user.entity.Grade;
 import com.contentree.interna.user.entity.Role;
 
@@ -16,4 +18,5 @@ public class SaveUserAndGetTokenRes {
 	String userName;
 	Grade userGrade;
 	Role userRole;
+	Calendar userBirth;
 }

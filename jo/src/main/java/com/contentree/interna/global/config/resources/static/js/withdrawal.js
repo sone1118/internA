@@ -78,9 +78,6 @@ const sendNumber = (e) => {
 		e.target.reset();
 		alert("인증에 성공했습니다.");
 		offModal2();
-		
-		//withdrawalLast로 이동
-		window.location.href = 'http://localhost:8080/jo/withdrawalLast';
 	}
 	else { //인증번호가 틀리면.
 		console.log("인증 번호가 틀렸습니다.");
