@@ -51,13 +51,13 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
 	
 	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-	private String client_id;
+	private String clientId;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
-	private String client_secret;
+	private String clientSecret;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-	private String redirect_uri;
+	private String redirectUri;
 
 	@Value("${spring.cookie.refresh-cookie-name}")
 	private String refreshCookieName;
@@ -78,6 +78,12 @@ public class UserService {
 	private final CookieUtil cookieUtil;
 
 
+	private final UserRepository userRepository;
+	private final JwtTokenUtil jwtTokenUtil;
+	private final RedisUtil redisUtil;
+	private final CookieUtil cookieUtil;
+	private final KakaoUtil kakaoUtil;
+
 	public OauthTokenDto getAccessToken(String code) {
 		log.info("UserService > getAccessToken - 인가코드 값으로 Token 생성");
 		// POST 방식으로 key=value 데이터 요청
@@ -90,10 +96,10 @@ public class UserService {
 		// HttpBody 오브젝트 생성
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("grant_type", "authorization_code");
-		params.add("client_id", client_id);
-		params.add("redirect_uri", redirect_uri);
+		params.add("client_id", clientId);
+		params.add("redirect_uri", redirectUri);
 		params.add("code", code);
-		params.add("client_secret", client_secret);
+		params.add("client_secret", clientSecret);
 
 		// HttpHeader 와 HttpBody 정보를 하나의 오브젝트에 담음
 		HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);

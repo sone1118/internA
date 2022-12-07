@@ -8,20 +8,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.contentree.interna.global.model.BaseResponseBody;
 import com.contentree.interna.global.util.CookieUtil;
 import com.contentree.interna.user.dto.OauthTokenDto;
 import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
-import com.contentree.interna.user.dto.UserGetLoginRes;
 import com.contentree.interna.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,8 +58,8 @@ public class UserController {
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = "로그인 성공"),
 			@ApiResponse(responseCode = "400", description = "로그인 실패") })
 	@GetMapping("/kakao/callback")
-	public String getLogin(@RequestParam(value = "code") String code,
-			HttpServletResponse httpServletResponse, RedirectAttributes redirect) {
+	public String login(@RequestParam(value = "code") String code, HttpServletResponse httpServletResponse,
+			RedirectAttributes redirect) {
 		log.info("UserController > getLogin - 인가코드로 토큰 발급, 사용자 정보와 토큰 저장");
 		// 넘어온 인가 코드를 통해 access_token 발급
 
@@ -97,14 +93,13 @@ public class UserController {
 		return "redirect:/";
 	}
 
-
 	@GetMapping("/api/users/logout")
 	@Tag(name = "회원 관리")
 	@Operation(summary = "로그아웃", description = "카카오톡 로그아웃")
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
 			@ApiResponse(responseCode = "400", description = "로그아웃 실패") })
-	public String logout(@ApiIgnore Principal principal, HttpServletRequest request,
-			HttpServletResponse response, RedirectAttributes redirect) {
+	public String logout(@ApiIgnore Principal principal, HttpServletRequest request, HttpServletResponse response,
+			RedirectAttributes redirect) {
 		log.info("UserController > logout - logout 시작");
 
 		Long userSeq = Long.valueOf(principal.getName());
@@ -115,7 +110,7 @@ public class UserController {
 		if (logoutComplete == false) {
 			log.error("UserController > logout - 로그아웃 실패");
 			redirect.addAttribute("error", "로그아웃에 실패했습니다.");
-			return  "redirect:/";
+			return "redirect:/";
 		}
 
 		String refreshToken = cookieUtil.getCookie(request, refreshCookieName).getValue();
@@ -125,7 +120,7 @@ public class UserController {
 		log.info("UserController > logout - deleteToken={}", deleteToken);
 		if (!deleteToken) {
 			log.error("UserController > logout - 토큰 삭제 실패");
-			redirect.addAttribute("error", "토큰 삭제 실패");
+			redirect.addAttribute("error", "로그아웃에 실패했습니다.");
 			return "redirect:/";
 		}
 
