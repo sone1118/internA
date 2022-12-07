@@ -74,16 +74,11 @@ public class UserService {
 	
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RedisUtil redisUtil;
-	private final KakaoUtil kakaoUtil;
-	private final CookieUtil cookieUtil;
-
-
-	private final UserRepository userRepository;
-	private final JwtTokenUtil jwtTokenUtil;
-	private final RedisUtil redisUtil;
 	private final CookieUtil cookieUtil;
 	private final KakaoUtil kakaoUtil;
 
+	
+	// [ 이연희 ] 카카오 access token 가져오기
 	public OauthTokenDto getAccessToken(String code) {
 		log.info("UserService > getAccessToken - 인가코드 값으로 Token 생성");
 		// POST 방식으로 key=value 데이터 요청
@@ -123,7 +118,7 @@ public class UserService {
 
 	}
 
-
+	// [ 이연희 ] 카카오 정보 불러오기
 	public KakaoProfile findProfile(String token) {
 		log.info("UserService > findProfile - KakaoProfile 형식에 맞는 객체 반환");
 
@@ -158,6 +153,8 @@ public class UserService {
 		}
 	}
 
+	
+	// [ 이연희 ] 회원가입(or 로그인) 및 토큰 생성
 	public SaveUserAndGetTokenRes SaveUserAndGetToken(String token) {
 		log.info(
 				"UserService > SaveUserAndGetToken - token을 사용히여 유저를 조회 후 db에 저장. accessToken, refreshToken을 생성하고 redis에 저장 후 userDto 객체 반환.");
@@ -205,6 +202,8 @@ public class UserService {
 		return userDto;
 	}
 
+	
+	// [ 이연희 ] 카카오 로그아웃
 	public Boolean logout(Long userSeq) {
 		// 카카오 로그아웃
 		User user = userRepository.findById(userSeq).get();
@@ -220,6 +219,8 @@ public class UserService {
 		return true;
 	}
 
+	
+	// [ 이연희 ] 토큰 삭제
 	public boolean deleteToken(String refreshToken, String accessToken, HttpServletResponse response) {
 		try {
 			log.info("UserService > deleteToken - redis와 cookie에 있는 refresh 토큰 삭제 후 만료시간 0인 토큰 추가");

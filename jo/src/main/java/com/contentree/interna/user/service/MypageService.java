@@ -1,12 +1,10 @@
 package com.contentree.interna.user.service;
 
-import java.util.Calendar;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.stereotype.Service;
 
 import com.contentree.interna.global.model.BusinessException;
@@ -22,11 +20,8 @@ import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.repository.JoinsRepository;
 import com.contentree.interna.user.repository.UserRepository;
 
-import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
-import groovyjarjarantlr4.v4.parse.ANTLRParser.throwsSpec_return;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice.OffsetMapping.ForOrigin.Renderer.ForReturnTypeName;
 
 /**
  * 
