@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -34,16 +35,19 @@ import springfox.documentation.annotations.ApiIgnore;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
+@Tag(name="회원 관리", description = "회원 관리 API")
 public class UserController {
-
-	private final UserService userService;
-	private final CookieUtil cookieUtil;
-
+	
 	@Value("${spring.cookie.refresh-cookie-name}")
 	private String refreshCookieName;
 
 	@Value("${spring.cookie.access-cookie-name}")
 	private String accessCookieName;
+
+	private final UserService userService;
+	
+	private final CookieUtil cookieUtil;
+	
 
 	// [ 이연희 ] 로그인, 회원가입, 토큰 발급 컨트롤러
 	// 프론트에서 인가코드 돌려 받는 주소
@@ -124,7 +128,41 @@ public class UserController {
 		return "redirect:/";
 	}
 
-//	@GetMapping("/refresh")
+
+	// [ 김지슬 ] 회원 탈퇴 
+	@Tag(name="회원 관리")
+	@DeleteMapping("/api/users")
+	@Operation(summary = "회원 탈퇴", description = "회원 정보를 회원 탈퇴 테이블로 넘깁니다.")
+	@ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공")
+	        })
+	public ResponseEntity<BaseResponseBody> removeUser(HttpServletRequest request, HttpServletResponse response, @ApiIgnore Principal principal) {
+		log.info("UserContoller > removeUser - 호출 (userSeq : {})", principal.getName());
+		Long userSeq = Long.parseLong(principal.getName());
+
+		// 1. 유저 정보 삭제 
+		userService.removeUser(userSeq);
+		
+		// 2. 토큰 블랙리스트 처리 
+		// 2-1. 각 토큰 쿠키에서 가져오기 (쿠키 및 쿠키 value의 null 처리는 jwtAuthenticationFilter에서 검증되었으므로 해당 과정 X)
+		String refreshToken = cookieUtil.getCookie(request, refreshCookieName).getValue();
+		String accessToken = cookieUtil.getCookie(request, accessCookieName).getValue();
+		
+		// 2-2. 각 토큰 블랙리스트 처리
+		userService.blackToken(refreshToken, accessToken);
+		
+		// 3. 쿠키 삭제
+		Cookie refreshDelCookie = cookieUtil.removeCookie(refreshCookieName);
+		Cookie accessDelCookie = cookieUtil.removeCookie(accessCookieName);
+		
+		response.addCookie(refreshDelCookie);
+		response.addCookie(accessDelCookie);
+		
+		log.info("UserContoller > removeUser - 회원 탈퇴 성공 (userSeq : {})", userSeq);
+		return ResponseEntity.status(200).body(BaseResponseBody.of(200, "회원 탈퇴 성공"));
+	}
+
+//	@GetMapping("/api/users/refresh")
 //	@Tag(name = "회원 관리")
 //	@Operation(summary = "토큰 재발급", description = "Refresh Token으로 Access Token을 재발급")
 //	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Access Token 재발급 성공"),
@@ -146,5 +184,4 @@ public class UserController {
 //		}
 //		return ResponseEntity.status(200).body(LoginRes.of(200, "Success", accessToken));
 //	}
-
 }

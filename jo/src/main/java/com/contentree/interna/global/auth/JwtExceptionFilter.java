@@ -33,16 +33,16 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (SignatureException ex) {
             log.error("JwtExceptionFilter - 유효하지 않은 JWT 서명. (JWT : {})", ex.getMessage());
-            response.sendError(400, "올바르지 않은 요청입니다.");
+            response.sendError(400, "[AUTH_001] 올바르지 않은 요청입니다.");
         } catch (MalformedJwtException ex) {
             log.error("JwtExceptionFilter - 올바르지 않은 JWT 토큰 구조. (JWT : {})", ex.getMessage());
-            response.sendError(400, "올바르지 않은 요청입니다.");
+            response.sendError(400, "[AUTH_001] 올바르지 않은 요청입니다.");
         } catch (UnsupportedJwtException ex) {
             log.error("JwtExceptionFilter - 지원하지 않는 형식의 JWT 토큰. (JWT : {})", ex.getMessage());
-            response.sendError(400, "올바르지 않은 요청입니다.");
+            response.sendError(400, "[AUTH_001] 올바르지 않은 요청입니다.");
         } catch (IllegalArgumentException ex) {
             log.error("JwtExceptionFilter - 정보가 담겨있지 않은 빈 토큰. (JWT : {})", ex.getMessage());
-            response.sendError(400, "올바르지 않은 요청입니다.");
+            response.sendError(400, "[AUTH_001] 올바르지 않은 요청입니다.");
 		} catch (BusinessException ex) {
 			ErrorCode errorCode = ex.getErrorCode();
 			String errorMessage = ex.getMessage();
@@ -55,7 +55,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 			} else if (errorCode == ErrorCode.NONEXISTENT_USER) {
 				log.error("JwtExceptionFilter - 존재하지 않는 userSeq (userSeq : {})", errorMessage);
 			}
-			response.sendError(400, "올바르지 않은 요청입니다.");
+			response.sendError(400, "[AUTH_001] 올바르지 않은 요청입니다.");
 		}
     }
 }

@@ -15,6 +15,7 @@ import com.contentree.interna.global.util.RedisUtil;
 import com.contentree.interna.user.dto.HomeGetUserDetailRes;
 import com.contentree.interna.user.dto.MypageGetUserDetailRes;
 import com.contentree.interna.user.entity.Joins;
+import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.repository.JoinsRepository;
 import com.contentree.interna.user.repository.UserRepository;
@@ -42,7 +43,7 @@ public class MypageService {
 	private final RedisUtil redisUtil;
 	
 	// [ 김지슬 ] 임직원 인증 인증번호 전송
-	public Boolean sendEmailToJoins(Long userSeq, String joinsId) {
+	public void sendEmailToJoins(Long userSeq, String joinsId) {
 		log.info("MypageService > sendEmailToJoins - 호출 (userSeq : {})", userSeq);
 		
 		// 1. 이미 임직원 인증한 회원인지 확인
@@ -72,12 +73,11 @@ public class MypageService {
 		// 4. 인증번호 및 joins id Redis에 저장 
 		redisUtil.setDataWithExpire("cert-" + userSeq, randomCode, validationExpiration);
 		redisUtil.setDataWithExpire("joins-" + userSeq, joinsId, validationExpiration);
-		
-		return true;
 	}
 	
+	
 	// [ 김지슬 ] 임직원 인증 코드 검증 
-	public boolean checkJoinsEmailCode(Long userSeq, String certificationCode) {
+	public void checkJoinsEmailCode(Long userSeq, String certificationCode) {
 		String userSeqString = userSeq.toString();
 		log.info("MypageService > checkJoinsEmailCode - 호출 (userSeq : {}, certificationCode : {})", userSeqString, certificationCode);
 		
@@ -102,15 +102,19 @@ public class MypageService {
 		String joinsKey = "joins-" + userSeqString;
 		String joinsId = redisUtil.getData(joinsKey);
 		log.info("MypageService > checkJoinsEmailCode - 저장된 joins id 가져오기 (userSeq : {}, joinsId : {})", userSeqString, joinsId);
+		
 		Joins joins = Joins.builder().userSeq(userSeq).joinsId(joinsId).build();
 		joinsRepository.save(joins);
 		
 		// 4. userSeq로 저장된 joins id 데이터 삭제 
 		redisUtil.deleteData(joinsKey);
 		
-		return true;
+		// 5. user Role Joins로 변경
+		userRepository.updateUserRole(userSeq, Role.ROLE_JOINS);
+		log.info("MypageService > checkJoinsEmailCode - user role 업데이트 성공 (userSeq : {}, 변경된 userRole : {})", userSeq, "ROLE_JOINS");
 	}
 
+	
 	// [ 손혜진 ] 회원 정보 가져오기
 	public HomeGetUserDetailRes getUserDetail(Long userSeq) {
 		//유저 정보 가져오기
