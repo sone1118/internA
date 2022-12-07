@@ -8,12 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.thymeleaf.cache.TTLCacheEntryValidity;
 
 import com.contentree.interna.global.util.CookieUtil;
 
@@ -46,9 +44,11 @@ public class CustomErrorController implements ErrorController{
         String statusMsg = status.toString();
         model.addAttribute("code", statusMsg);
         
-        String message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE).toString();
-        if (!"".equals(message)) {
-        	if ("AUTH_001".equals(message.substring(1, 9))) {
+        Object messageObj = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+        
+        if (messageObj != null) {
+        	String message = messageObj.toString();
+        	if (!"".equals(message) && "AUTH_001".equals(message.substring(1, 9))) {
         		Cookie removeRefreshCookie = cookieUtil.removeCookie(refreshCookieName);
             	Cookie removeAccessCookie = cookieUtil.removeCookie(accessCookieName);
             	
