@@ -57,7 +57,7 @@ public class UserService {
 	private String client_secret;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-	String redirect_uri;
+	private String redirect_uri;
 
 	@Value("${spring.cookie.refresh-cookie-name}")
 	private String refreshCookieName;
@@ -75,6 +75,7 @@ public class UserService {
 	private final JwtTokenUtil jwtTokenUtil;
 	private final RedisUtil redisUtil;
 	private final KakaoUtil kakaoUtil;
+	private final CookieUtil cookieUtil;
 
 
 	public OauthTokenDto getAccessToken(String code) {
@@ -255,7 +256,7 @@ public class UserService {
 		// 3-1. 정보 완전히 삭제할 날짜 계산 (오늘로부터 1년 뒤)
 		Calendar expirationDate = Calendar.getInstance();
 		expirationDate.setTime(new Date());
-		expirationDate.add(Calendar.YEAR, 1);
+		expirationDate.add(Calendar.DATE, 30);
 		
 		WithdrawalUser withdrawalUser = WithdrawalUser.builder()
 				.userSeq(userSeq)
