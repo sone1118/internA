@@ -1,10 +1,5 @@
 let timer;
 let isRunning = false;
-let randomNumber = 0;
-
-const createRandomNumber = (min, max) => {
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-};
 
 const offModal1 = () => {
 	document.querySelector(".authenticate_bg1").style.display = "none";
@@ -51,49 +46,86 @@ const startTimer = (count, display) => {
     }, 1000);
 };
 
+//이메일 형태로 가는지 확인할 필요가 있을 것 같다.
 const sendEmail = (e) => {
 	e.preventDefault(); //새로고침 방지
-      	
-	e.target.reset(); //input 값 전부 비우기
-	onModal2(); //인증 번호 입력창 보여주기
 	
-	let leftSec = 180; // timer 설정
-	const display = document.querySelector('#timer');
+	const joinsId = document.querySelector("#joinsId").value;
+	console.log(joinsId);
+	console.log("메일에 인증 번호를 전송합니다");	
 	
-	if (isRunning) clearInterval(timer); // 타이머가 이미 작동중이면 중지
-	else isRunning = true;
-	
-	startTimer(leftSec, display); //타이머 시작
-	document.querySelector("#error_message").innerText = ""; //에러 메세지가 있으면 지우기   
-	randomNumber = createRandomNumber(10000, 99999); //핸드폰으로 랜덤값 인증 번호 보내기
-	console.log("인증번호: ", randomNumber);
+	const emailData = {
+		method: 'POST',
+		body: JSON.stringify({'joinsId': joinsId}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	};
+	 fetch('/jo/api/users/send-joins', emailData)
+    .then((response) => {	
+		console.log("response: ", response);
+		if(!response.ok) throw Error(); //에러던지기
+		console.log("이메일 전송에 성공했습니다.");
+		console.log("response status: ", response.status);
+        
+		e.target.reset(); //input 값 전부 비우기
+		onModal2(); //인증 번호 입력창 보여주기
+		
+		let leftSec = 180; // timer 설정
+		const display = document.querySelector('#timer');
+		
+		if (isRunning) clearInterval(timer); // 타이머가 이미 작동중이면 중지
+		else isRunning = true;
+		
+		startTimer(leftSec, display); //타이머 시작
+		document.querySelector("#error_message").innerText = ""; //에러 메세지가 있으면 지우기  
+    })
+    .catch((error) => { //메일 전송에 실패 했을 경우
+        console.log("이메일 전송에 실패했습니다. error: ", error);
+        alert("이메일 전송에 실패했습니다.");
+        offModal1();
+    });
 };
 
 const sendNumber = (e) => {
 	e.preventDefault(); //새로고침 방지
-	
 	console.log("인증번호를 보냅니다."); 
 	
-	if(document.querySelector(".input_text2").value == randomNumber) { //인증번호가 맞으면
+	const certificationCode = document.querySelector("#certificationCode").value;
+	console.log(certificationCode);
+	
+	const certificationCodeData = {
+		method: 'POST',
+		body: JSON.stringify({'certificationCode': certificationCode}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	};
+	
+	 fetch('/jo/api/users/check-joins', certificationCodeData)
+    .then((response) => {
+		console.log(response.status);
+		if(!response.ok) throw Error(); //에러 던지기
+		
+		console.log("인증 번호가 일치합니다.");
+		console.log("response status: ", response.status);
+		
 		e.target.reset();
 		alert("인증에 성공했습니다.");
 		offModal2();
-		
-		//withdrawalLast로 이동
-		window.location.href = 'http://localhost:8080/jo/withdrawalLast';
-	}
-	else { //인증번호가 틀리면.
-		console.log("인증 번호가 틀렸습니다.");
+    })
+    .catch((error) => { //인증번호 인증에 실패 했을 경우.
+        console.log("인증 번호가 틀렸습니다. error: ", error);
 		document.querySelector("#error_message").innerText = "인증 번호가 틀렸습니다.";
 		e.target.reset();
 		document.querySelector(".input_text2").focus();
-	}
+    });
 };
 
 const authenticate = () => {
 	const email_btn =  document.querySelector("#email_btn"); //이메일 모달창 버튼
-	const email_form1 = document.querySelector("#email_form1"); //이메일 form
-	const email_form2 = document.querySelector("#email_form2"); //인증번호 form
+	const email_form1 = document.querySelector("#email_form1");
+	const email_form2 = document.querySelector("#email_form2");
 	
 	email_btn && email_btn.addEventListener("click", onModal1); //이메일 모달창 띄우기
 	email_form1 && email_form1.addEventListener("submit", sendEmail); //이메일 보내기

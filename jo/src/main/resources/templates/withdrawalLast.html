@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layouts/layout}">
+	<th:block layout:fragment="content">
+		<div class="content1">
+			<div style="font-size: 1.2rem" ><b>회원 탈퇴 시 유의사항</b></div>
+			<div style="width: 900px">
+				JO! 회원 탈퇴 시 모든 JO!제휴 브랜드로부터 함께 탈퇴되며 30일 이내 재가입이 불가능합니다.<br>
+				탈퇴 시 보유하고 계신 쿠폰, 포인트, 등급정보가 즉시 자동 소멸 됩니다.<br>
+				JO!의 모든 제휴 브랜드에서 보유하신 혜택들은 즉시 자동 소멸되며 복구되지 않습니다.<br>
+				진행 중인 전자상거래 이용내역(배송/교환/반품 중인 상태)이 있거나 이용하신 서비스가 완료되지 않은 경우 탈퇴하실 수 없습니다.<br>
+				기타 탈퇴와 관련된 모든 정책은 JO!회원가입 시 동의하신 JO!회원 약관 및 개인정보 제공, 활용 등의 내용에 따릅니다.<br>
+				회원 탈퇴를 하시면 해당 아이디는 즉시 탈퇴 처리되며, 해당 아이디에 대한 회원 정보 및 서비스 정보는 모두 삭제됩니다.<br>
+				탈퇴한 아이디는 영구적으로 사용이 중지되며, 30일 이후에 가입이 가능합니다.<br><br>
+			</div>
+			<div style="font-size: 1.2rem"><b>회원 정보 보존 안내 사항</b></div>
+			<div style="width: 900px">
+				탈퇴 후 30일간 재가입 방지 및 포인트 불법 이용 및 부정 행위를 방지하기 위해 회원님의 아이디를 포함한 회원 정보가 보존됩니다.<br>
+				(회원가입 시 동의하신 개인정보 처리 방침에 명시한 파기철차와 방법에 따라 30일 이후 회원 정보를 지체 없이 파기합니다.)<br>
+				전자상거래 이용내역이 있는 회원님은 전자상거래 등에서서의 소비자보호에 관한 법률에 의거 교환/반품/환불 및 사후처리(A/S)등을 위해 회원 정보가 관리됩니다.<br>
+			</div>
+			<div>
+				<button id="cancle_btn" type="button" onclick="location.href='/jo'">취소</button> 
+				<button id="confirm_btn" type="button">탈퇴</button>
+			</div>							
+		</div>
+		<script type="text/javascript" th:src="@{/js/withdrawalLast.js}"></script>
+	</th:block>
+</html>

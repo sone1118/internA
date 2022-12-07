@@ -49,13 +49,21 @@ const startTimer = (count, display) => {
 //이메일 형태로 가는지 확인할 필요가 있을 것 같다.
 const sendEmail = (e) => {
 	e.preventDefault(); //새로고침 방지
-
+	
+	const joinsId = document.querySelector("#joinsId").value;
+	console.log(joinsId);
 	console.log("메일에 인증 번호를 전송합니다");	
-	 fetch(e.target.action, { //이메일 보내기
-        method: 'POST',
-        body: new URLSearchParams(new FormData(e.target))
-    })
+	
+	const emailData = {
+		method: 'POST',
+		body: JSON.stringify({'joinsId': joinsId}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	};
+	 fetch('/jo/api/users/send-joins', emailData)
     .then((response) => {	
+		console.log("response: ", response);
 		if(!response.ok) throw Error(); //에러던지기
 		console.log("이메일 전송에 성공했습니다.");
 		console.log("response status: ", response.status);
@@ -81,14 +89,22 @@ const sendEmail = (e) => {
 
 const sendNumber = (e) => {
 	e.preventDefault(); //새로고침 방지
-	
 	console.log("인증번호를 보냅니다."); 
 	
-	fetch(e.target.action, { //인증번호 보내기
-        method: 'POST',
-        body: new URLSearchParams(new FormData(e.target))
-    })
+	const certificationCode = document.querySelector("#certificationCode").value;
+	console.log(certificationCode);
+	
+	const certificationCodeData = {
+		method: 'POST',
+		body: JSON.stringify({'certificationCode': certificationCode}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	};
+	
+	 fetch('/jo/api/users/check-joins', certificationCodeData)
     .then((response) => {
+		console.log(response.status);
 		if(!response.ok) throw Error(); //에러 던지기
 		
 		console.log("인증 번호가 일치합니다.");
@@ -97,6 +113,9 @@ const sendNumber = (e) => {
 		e.target.reset();
 		alert("인증에 성공했습니다.");
 		offModal2();
+		
+		//home으로 리다이랙트
+		window.location.href = 'http://localhost:8080/jo/';
     })
     .catch((error) => { //인증번호 인증에 실패 했을 경우.
         console.log("인증 번호가 틀렸습니다. error: ", error);

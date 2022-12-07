@@ -12,6 +12,7 @@ import lombok.Getter;
 @Builder
 public class UserGetLoginRes {
 	String userName;
-	Grade userGrade;
-	Role userRole;
+	String userGrade;
+	Boolean userRole;
+	Boolean userBirth;
 }

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
@@ -16,7 +15,7 @@
 					<div class="authenticate_contents">
 						<div><h3>조인스 ID</h3></div>
 						<div>
-							<form id="email_form1" action="/jo/api/users/send-joins" method="post">
+							<form id="email_form1" action="/jo/api/users/send-joins">
 								<div>
 									<input type="text" id="joinsId" class="input_text1" placeholder="joins id here" required/><span> &#64;joins.net</span>
 								</div>
@@ -34,7 +33,7 @@
 					<div class="authenticate_contents">
 						<div><h3>인증번호</h3></div>
 						<div>
-							<form id="email_form2" action="/jo/api/users/check-joins" method="post">
+							<form id="email_form2" action="/jo/api/users/check-joins">
 								<div>
 									<input type="text" id="certificationCode" class="input_text2" placeholder="input certificationCode here" required/>
 								</div>
