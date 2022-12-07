@@ -168,6 +168,12 @@
 			<version>2.2.6.RELEASE</version>
 
 		</dependency>
+		<!--기본 org.json  -->
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20180813</version>
+		</dependency>
    </dependencies>
    
    <build>
