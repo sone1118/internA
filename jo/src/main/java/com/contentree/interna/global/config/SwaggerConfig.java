@@ -28,7 +28,8 @@ public class SwaggerConfig {
         		.securityContexts(Arrays.asList(securityContext()))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.contentree.interna"))
-                .paths(PathSelectors.any())
+                .paths(PathSelectors.ant("/api/**"))
+                .paths(PathSelectors.ant("/kakao/**"))
                 .build().apiInfo(apiInfo());
 
     }
