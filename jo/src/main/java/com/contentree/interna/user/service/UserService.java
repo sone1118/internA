@@ -2,6 +2,8 @@ package com.contentree.interna.user.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -25,9 +27,13 @@ import com.contentree.interna.user.dto.KakaoProfile;
 import com.contentree.interna.user.dto.OauthTokenDto;
 import com.contentree.interna.user.dto.SaveUserAndGetTokenRes;
 import com.contentree.interna.user.entity.Grade;
+import com.contentree.interna.user.entity.Joins;
 import com.contentree.interna.user.entity.Role;
 import com.contentree.interna.user.entity.User;
+import com.contentree.interna.user.entity.WithdrawalUser;
+import com.contentree.interna.user.repository.JoinsRepository;
 import com.contentree.interna.user.repository.UserRepository;
+import com.contentree.interna.user.repository.WithdrawalUserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,19 +42,14 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * @author 이연희
+ * @author 이연희, 김지슬
  *
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-	private final UserRepository userRepository;
-	private final JwtTokenUtil jwtTokenUtil;
-	private final RedisUtil redisUtil;
-	private final CookieUtil cookieUtil;
-	private final KakaoUtil kakaoUtil;
-
+	
 	@Value("${spring.security.oauth2.client.registration.kakao.client-id}")
 	private String client_id;
 
@@ -56,7 +57,7 @@ public class UserService {
 	private String client_secret;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-	private String redirect_uri;
+	String redirect_uri;
 
 	@Value("${spring.cookie.refresh-cookie-name}")
 	private String refreshCookieName;
@@ -66,6 +67,15 @@ public class UserService {
 
 	@Value("${spring.security.jwt.refresh-token-expiration}")
 	private Integer refreshTokenExpiration;
+	
+	private final UserRepository userRepository;
+	private final WithdrawalUserRepository withdrawalUserRepository;
+	private final JoinsRepository joinsRepository;
+	
+	private final JwtTokenUtil jwtTokenUtil;
+	private final RedisUtil redisUtil;
+	private final KakaoUtil kakaoUtil;
+
 
 	public OauthTokenDto getAccessToken(String code) {
 		log.info("UserService > getAccessToken - 인가코드 값으로 Token 생성");
@@ -105,6 +115,7 @@ public class UserService {
 		}
 
 	}
+
 
 	public KakaoProfile findProfile(String token) {
 		log.info("UserService > findProfile - KakaoProfile 형식에 맞는 객체 반환");
@@ -223,6 +234,72 @@ public class UserService {
 		}
 		return true;
 	}
+	
+	
+	// [ 김지슬 ] 회원 탈퇴 
+	public void removeUser(Long userSeq) {
+		log.info("UserService > removeUser - 호출 (userSeq : {})", userSeq);
+		// 1. userSeq로 User 객체 찾아오기
+		// (jwtAuthenticationFilter에서 해당 userSeq의 user 정보가 있는지 먼저 확인하기 때문에, 따로 검증 과정 X)
+		User user = userRepository.findById(userSeq).get();
+		
+		// 2. 연결된 조인스 아이디가 있다면 가져오기
+		Optional<Joins> joins = joinsRepository.findById(userSeq);
+		String joinsId = null;
+		if (joins.isPresent()) {
+			joinsId = joins.get().getJoinsId();
+			log.info("UserService > removeUser - user joins id : {}", joinsId);
+		}
+		
+		// 3. 탈퇴 유저 테이블에 저장 
+		// 3-1. 정보 완전히 삭제할 날짜 계산 (오늘로부터 1년 뒤)
+		Calendar expirationDate = Calendar.getInstance();
+		expirationDate.setTime(new Date());
+		expirationDate.add(Calendar.YEAR, 1);
+		
+		WithdrawalUser withdrawalUser = WithdrawalUser.builder()
+				.userSeq(userSeq)
+				.userName(user.getUserName())
+				.userEmail(user.getUserEmail())
+				.userPhone(user.getUserPhone())
+				.userBirth(user.getUserBirth())
+				.userKakaoId(user.getUserKakaoId())
+				.userRole(user.getUserRole())
+				.userGrade(user.getUserGrade())
+				.userAgreeMarketing(user.isUserAgreeMarketing())
+				.userAgreeSns(user.isUserAgreeSns())
+				.userExpirationDate(expirationDate)
+				.userJoinsId(joinsId)
+				.build();
+		
+		withdrawalUserRepository.save(withdrawalUser);
+		log.info("UserService > removeUser - 탈퇴 회원 테이블로 이동 성공 (userSeq : {}, 정보 삭제 예정일 : {})", userSeq, expirationDate);
+		
+		// 4. 조인스 아이디 있다면 테이블에서 데이터 삭제
+		if (joinsId != null) {
+			joinsRepository.delete(joins.get());
+			log.info("UserService > removeUser - joins data 삭제 성공 (userSeq : {}, joinsId : {})", userSeq, joinsId);
+		}
+		
+		// 5. 유저 테이블에서 삭제 
+		userRepository.delete(user);
+		log.info("UserService > removeUser - user data 삭제 성공 (userSeq : {})", userSeq);
+				
+		// 6. 카카오 연결 끊기
+		kakaoUtil.unlinkUser(user.getUserKakaoId());
+	}
+	
+	
+	// [ 김지슬 ] 토큰 블랙리스트 처리 
+	public void blackToken(String refreshToken, String accessToken) {
+		// refresh token redis에서 삭제
+		redisUtil.deleteData(refreshToken);
+		
+		// access token 블랙리스트 처리
+		Integer tokenExpiration = jwtTokenUtil.getTokenExpirationAsInt(accessToken);
+        redisUtil.setDataWithExpire(accessToken, "B", tokenExpiration);
+	}
+
 //
 //	public String reissueToken(HttpServletRequest request, HttpServletResponse response) {
 //
@@ -267,5 +344,4 @@ public class UserService {
 //		}
 //		return null;
 //	}
-
 }
