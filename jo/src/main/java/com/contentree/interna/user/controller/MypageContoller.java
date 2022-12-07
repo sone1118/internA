@@ -74,7 +74,7 @@ public class MypageContoller {
 	
 	// [ 김지슬 ] 임직원 인증 코드 검증 
 	@Tag(name="마이페이지")
-	@PatchMapping("/check-joins")
+	@PostMapping("/check-joins")
 	@Operation(summary = "임직원 인증 코드 검증", description = "중앙 임직원 여부를 확인하기 위해 joins 이메일로 전송한 인증코드를 검사합니다.")
 	@ApiResponses({
 	        @ApiResponse(responseCode = "201", description = "임직원 인증 성공"),
