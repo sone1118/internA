@@ -46,8 +46,8 @@ public class SecurityConfig {
 			.httpBasic().authenticationEntryPoint(customAuthenticationEntryPoint)   // 인증 되지 않은 유저가 요청했을때 동작
 			.and()
 			.authorizeRequests()
-			.antMatchers("/v2/api-docs", "/swagger*/**").permitAll()
-			.antMatchers("/api/users/send-joins").hasAnyRole("USER", "ADMIN")	// api 권한 설정 
+			.antMatchers("/api/**", "/mypage", "/withdrawal", "/withdrawalLast", "/joins", "/phoenix", "/megabox").hasAnyRole("USER", "JOINS", "ADMIN")
+			.antMatchers("/v2/api-docs", "/swagger*/**").permitAll()	// api 권한 설정 
 			.anyRequest().permitAll();
 		
 		// jwt filter 적용 
