@@ -13,15 +13,15 @@ import com.contentree.interna.user.repository.UserRepository;
  *
  */
 @Service
-public class CustomUserDetailsService {
-
+public class CustomUserDetailsService{
+	
 	private UserRepository userRepository;
-
+	
 	public CustomUserDetailsService(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
-
-	// userSeq로 유저 데이터 가져오기
+	
+	// userSeq로 유저 데이터 가져오기 
 	public User getUserDetail(Long userSeq) {
 		Optional<User> user = userRepository.findById(userSeq);
 		if (user.isPresent()) {

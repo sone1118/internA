@@ -11,6 +11,7 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.AuthorizationScope;
 import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
@@ -26,6 +27,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
         		.useDefaultResponseMessages(false)
         		.securityContexts(Arrays.asList(securityContext()))
+        		.securitySchemes(Arrays.asList(apiKey("Authorization", "Authorization", "header")))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.contentree.interna"))
                 .paths(PathSelectors.any())
@@ -52,6 +54,10 @@ public class SwaggerConfig {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(new SecurityReference("Authorization", authorizationScopes), new SecurityReference("Refresh", authorizationScopes));
+        return Arrays.asList(new SecurityReference("Authorization", authorizationScopes));
+    }
+    
+    private ApiKey apiKey(String name, String keyName, String passAs) {
+        return new ApiKey(name, keyName, passAs);
     }
 }

@@ -25,18 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-	@Override
-	public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-			AuthenticationException e) throws IOException, ServletException {
-		log.error("CustomAuthenticationEntryPoint - 호출 > 로그인하지 않은 유저 접근");
-		ObjectMapper objectMapper = new ObjectMapper();
+    @Override
+    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
+        log.error("CustomAuthenticationEntryPoint - 호출 > 로그인하지 않은 유저 접근");
+        ObjectMapper objectMapper = new ObjectMapper();
 
-		httpServletResponse.setStatus(401);
-		httpServletResponse.setContentType("application/json;charset=utf-8");
-		BaseResponseBody response = new BaseResponseBody(401, "유저 정보가 존재하지 않습니다.");
+        httpServletResponse.setStatus(401);
+        httpServletResponse.setContentType("application/json;charset=utf-8");
+        BaseResponseBody response = new BaseResponseBody(401 ,"유저 정보가 존재하지 않습니다.");
 
-		PrintWriter out = httpServletResponse.getWriter();
-		String jsonResponse = objectMapper.writeValueAsString(response);
-		out.print(jsonResponse);
-	}
+        PrintWriter out = httpServletResponse.getWriter();
+        String jsonResponse = objectMapper.writeValueAsString(response);
+        out.print(jsonResponse);
+    }
 }
