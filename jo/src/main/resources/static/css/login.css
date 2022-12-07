@@ -255,9 +255,36 @@ h1 {
 	align-items: center;
 }
 
+#error-message {
+	font-size: 20px;
+}
 
+#error-code {
+	font-size: 100px;
+	font-weight: bold;
+}
 
+#error-content {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
 
+#home-button {
+	margin-top: 30px;
+	height: 60px;
+	width: 400px;
+	background-color: #ff9933;
+	position: relative;
+	display: inline-block;
+	border: none;
+	border-radius: 15px;
+	text-decoration: none;
+	color: white;
+	font-weight: 600;
+	font-size: 1.3rem;
+}
 
 
 
