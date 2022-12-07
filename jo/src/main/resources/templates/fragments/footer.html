@@ -2,14 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<th:block th:fragment=footer>
 		<div id="footer">
-			<img 
-			class="logos" 
-			th:src="@{/images/megabox_logo.png}" 
-			alt="megabox"/>
-			<img 
-			class="logos" 
-			th:src="@{/images/phoenix_logo.png}" 
-			alt="phoenix"/>
+			<a th:onclick="|location.href='@{/megabox}'|">
+				<img 
+				class="logos" 
+				th:src="@{/images/megabox_logo.png}" 
+				alt="megabox"/>
+			</a>
+			<a th:onclick="|location.href='@{/phoenix}'|">
+				<img 
+				class="logos" 
+				th:src="@{/images/phoenix_logo.png}" 
+				alt="phoenix"/>
+			</a>
 			<img 
 			class="logos" 
 			th:src="@{/images/jtbc_logo.png}" 

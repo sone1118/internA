@@ -159,6 +159,7 @@ public class UserService {
 		log.info(
 				"UserService > SaveUserAndGetToken - token을 사용히여 유저를 조회 후 db에 저장. accessToken, refreshToken을 생성하고 redis에 저장 후 userDto 객체 반환.");
 		KakaoProfile profile = findProfile(token);
+		Long kakaoId = profile.getId();
 
 		Calendar cal = Calendar.getInstance();
 		int year = 1998;
@@ -174,10 +175,13 @@ public class UserService {
 		if (user == null) {
 			user = User.builder().userName(profile.getKakao_account().getProfile().getNickname())
 					.userEmail(profile.getKakao_account().getEmail()).userPhone(userPhone).userBirth(cal)
-					.userKakaoId(profile.getId()).userRole(Role.ROLE_USER).userGrade(Grade.BRONZE)
+					.userKakaoId(kakaoId).userRole(Role.ROLE_USER).userGrade(Grade.BRONZE)
 					.userAgreeMarketing(true).userAgreeMarketing(true).build();
 			userRepository.save(user);
 		} else if (!user.getUserEmail().equals(profile.getKakao_account().getEmail())) {// 중복가입
+			// 카카오 요청 보내기
+			kakaoUtil.unlinkUser(kakaoId);
+			
 			log.error(user.getUserEmail());
 			log.error(profile.getKakao_account().getEmail());
 			log.error("UserService > SaveUserAndGetToken - 유저정보가 데이터베이스에 이미 존재");
