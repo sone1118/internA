@@ -127,4 +127,13 @@ public class MainController {
     	model.addAttribute("userName", userName);
     	return "megabox";
     }
+    
+ // [ 김지슬 ] go to megabox.html
+    @GetMapping("/phoenix")
+    public String phoenix(Principal principal, Model model) {
+    	String userName = userService.getUserName(Long.parseLong(principal.getName()));
+    	
+    	model.addAttribute("userName", userName);
+    	return "phoenix";
+    }
 }

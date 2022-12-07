@@ -12,13 +12,22 @@ body {
     height: 100%;
 }
 
-#megabox-ad {
+#ad {
     background-size: cover;
     width: 100vw;
     height: 10vh;
 }
 
-#welcome-box {
+#main {
+    background-size: cover;
+    width: 100vw;
+    height: 90vh;
+	
+	position: relative;
+	z-index:-100;
+}
+
+#megabox-welcome-box {
 	color: #888888;
 	background-color: black;
 	width: 30vw;
@@ -30,13 +39,21 @@ body {
 	float: right;
 }
 
-
-#megabox {
-    background-size: cover;
-    width: 100vw;
-    height: 90vh;
+#phoenix-welcome-box {
+	color: white;
+	background-color: #1a2060;
+	width: 20vw;
+	height: 90px;
 	
-	position: relative;
-	z-index:-100;
+	display: flex;
+	
+	padding-top: 30px;
+	float: right;
 }
+
+#phoenix-welcome-box div {
+	font-weight: bold;
+	font-size: 15px;
+}
+
 
