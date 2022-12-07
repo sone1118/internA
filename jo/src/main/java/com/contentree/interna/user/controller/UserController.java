@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,8 +63,6 @@ public class UserController {
 		log.info("UserController > getLogin - 인가코드로 토큰 발급, 사용자 정보와 토큰 저장");
 		// 넘어온 인가 코드를 통해 access_token 발급
 
-		// TODO String으로 error 보내기 ->타임리프
-
 		OauthTokenDto oauthToken = userService.getAccessToken(code);
 
 		if (oauthToken == null) {
@@ -77,7 +76,7 @@ public class UserController {
 
 		if (saveAndGetTokenRes == null) {
 			log.info("UserController > getLogin - 중복가입");
-			redirect.addAttribute("error", "로그인에 실패했습니다.");
+			redirect.addAttribute("error", "이미 등록한 이메일이 있습니다");
 			return "redirect:/";
 		}
 
@@ -136,7 +135,7 @@ public class UserController {
 	@ApiResponses({
 	        @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공")
 	        })
-	public ResponseEntity<BaseResponseBody> removeUser(HttpServletRequest request, HttpServletResponse response, @ApiIgnore Principal principal) {
+	public ResponseEntity<BaseResponseBody> removeUser(HttpServletRequest request, HttpServletResponse response, @ApiIgnore Principal principal, RedirectAttributes redirect) {
 		log.info("UserContoller > removeUser - 호출 (userSeq : {})", principal.getName());
 		Long userSeq = Long.parseLong(principal.getName());
 

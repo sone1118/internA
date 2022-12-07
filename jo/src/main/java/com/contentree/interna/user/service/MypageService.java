@@ -6,11 +6,13 @@ import java.util.Optional;
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.stereotype.Service;
 
 import com.contentree.interna.global.model.BusinessException;
 import com.contentree.interna.global.model.ErrorCode;
 import com.contentree.interna.global.util.MailUtil;
+import com.contentree.interna.global.util.MaskingUtil;
 import com.contentree.interna.global.util.RedisUtil;
 import com.contentree.interna.user.dto.HomeGetUserDetailRes;
 import com.contentree.interna.user.dto.MypageGetUserDetailRes;
@@ -20,8 +22,11 @@ import com.contentree.interna.user.entity.User;
 import com.contentree.interna.user.repository.JoinsRepository;
 import com.contentree.interna.user.repository.UserRepository;
 
+import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
+import groovyjarjarantlr4.v4.parse.ANTLRParser.throwsSpec_return;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.asm.Advice.OffsetMapping.ForOrigin.Renderer.ForReturnTypeName;
 
 /**
  * 
@@ -41,6 +46,7 @@ public class MypageService {
 	
 	private final MailUtil mailUtil;
 	private final RedisUtil redisUtil;
+	private final MaskingUtil maskingUtil;
 	
 	// [ 김지슬 ] 임직원 인증 인증번호 전송
 	public void sendEmailToJoins(Long userSeq, String joinsId) {
@@ -122,14 +128,16 @@ public class MypageService {
 		log.info("home의 데이터를 요청했습니다.");
 		User user = userRepository.findById(userSeq).get();
 			
+		if(user == null) throw new NullPointerException();
+		
 		//home 화면에서 쓸 userDTO 설정
 		HomeGetUserDetailRes userDetail = new HomeGetUserDetailRes();
 		userDetail.setUserName(user.getUserName());
-		userDetail.setUserBirth(todayIsBirthday(user.getUserBirth()));
+		userDetail.setUserBirth(maskingUtil.todayIsBirthday(user.getUserBirth()));
 		
 		//getGradeString를 이용해서 grade를 변환해 주고 싶었는데 이것을 service에서 해도 되는지, util 함수로 따로빼서 가독성을 높이고 싶었다.
-		String grade = getGradeString(user.getUserGrade().toString());
-		userDetail.setUserGrade(grade);
+		String grade = maskingUtil.getGradeString(user.getUserGrade().toString());
+		userDetail.setUserGrade(grade);;
 		
 		//role: joins일 경우에 true로
 		userDetail.setUserRole((user.getUserRole().toString() == "ROLE_JOINS") ? true : false);
@@ -144,13 +152,13 @@ public class MypageService {
 		log.info("유저정보 가져오기: seq" + userSeq);
 		log.info("mypage의 data를 요청했습니다.");
 		User user = userRepository.findById(userSeq).get();
-		
+		if(user == null) throw new NullPointerException();
 		//*처리해서 보내준다.
 		MypageGetUserDetailRes userDetail = new MypageGetUserDetailRes();
 		userDetail.setUserName(user.getUserName());
 		
 		//이메일 *처리
-		String email = getHiddenEmail(user.getUserEmail());
+		String email = maskingUtil.getHiddenEmail(user.getUserEmail());
 		userDetail.setUserEmail(email);
 		
 		userDetail.setUserBirth("****.**.**");
@@ -159,28 +167,5 @@ public class MypageService {
 		userDetail.setUserRole((user.getUserRole().toString() == "ROLE_JOINS") ? true : false);
 	
 		return userDetail;
-	}
-	
-
-	//util로 빼서 static으로 하면
-	private String getGradeString(String grade) {
-		if(grade == "GOLD") return "G";
-		if(grade == "SILVER") return "S";
-		return "B";	
-		//"GOLD".equals(grade); true false로
-	}
-	
-	private Boolean todayIsBirthday(Calendar birth) {
-		Calendar today = Calendar.getInstance();
-		if(today.get(Calendar.MONTH) != birth.get(Calendar.MONTH)) return false;
-		if(today.get(Calendar.DATE) != birth.get(Calendar.DATE)) return false;
-		return true;
-	} 
-	
-	private String getHiddenEmail(String email) {
-		String[] splitedEmail = email.split("@");
-		String frontString = splitedEmail[0].replaceAll("(?<=.{1}).", "*");
-		String backString = splitedEmail[1].replaceAll("(?<=.{2}).", "*");
-		return (frontString + "@" + backString);
 	}
 }
