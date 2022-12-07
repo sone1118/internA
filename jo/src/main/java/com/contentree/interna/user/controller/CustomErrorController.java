@@ -1,15 +1,23 @@
 package com.contentree.interna.user.controller;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.thymeleaf.cache.TTLCacheEntryValidity;
 
+import com.contentree.interna.global.util.CookieUtil;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,19 +27,37 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class CustomErrorController implements ErrorController{
+	
+	@Value("${spring.cookie.refresh-cookie-name}")
+    private String refreshCookieName;
     
-    @ExceptionHandler(Throwable.class)
+    @Value("${spring.cookie.access-cookie-name}")
+    private String accessCookieName;
+    
+	private final CookieUtil cookieUtil;
+
+	
+	@ExceptionHandler(Throwable.class)
     @GetMapping("/error")
-    public String handleError(HttpServletRequest request, Model model) {
+    public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         String statusMsg = status.toString();
         model.addAttribute("code", statusMsg);
         
-        Object message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
-        if (message != null) {
-        	model.addAttribute("msg", message.toString());
-        	log.info("CustomErrorController > handleError - 호출 (코드 : {}, 에러 메시지: {})", statusMsg, message.toString());
+        String message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE).toString();
+        if (!"".equals(message)) {
+        	if ("AUTH_001".equals(message.substring(1, 9))) {
+        		Cookie removeRefreshCookie = cookieUtil.removeCookie(refreshCookieName);
+            	Cookie removeAccessCookie = cookieUtil.removeCookie(accessCookieName);
+            	
+            	response.addCookie(removeRefreshCookie);
+            	response.addCookie(removeAccessCookie);
+            	log.error("CustomErrorController > handleError - 잘못된 토큰. 토큰 쿠키 삭제");
+        	}
+        	model.addAttribute("msg", message);
+        	log.info("CustomErrorController > handleError - 호출 (코드 : {}, 에러 메시지: {})", statusMsg, message);
         } else {
         	HttpStatus httpStatus = HttpStatus.valueOf(Integer.valueOf(statusMsg));
         	model.addAttribute("msg", httpStatus);
