@@ -1,6 +1,6 @@
 let timer;
 let isRunning = false;
-let randomNumber = 0;
+let randomNumber = 1234;
 
 const createRandomNumber = (min, max) => {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -65,7 +65,7 @@ const sendEmail = (e) => {
 	
 	startTimer(leftSec, display); //타이머 시작
 	document.querySelector("#error_message").innerText = ""; //에러 메세지가 있으면 지우기   
-	randomNumber = createRandomNumber(10000, 99999); //핸드폰으로 랜덤값 인증 번호 보내기
+	//randomNumber = createRandomNumber(10000, 99999); //핸드폰으로 랜덤값 인증 번호 보내기
 	console.log("인증번호: ", randomNumber);
 };
 
@@ -78,6 +78,9 @@ const sendNumber = (e) => {
 		e.target.reset();
 		alert("인증에 성공했습니다.");
 		offModal2();
+		
+		//withdrawalLast로 이동
+		window.location.href = 'http://localhost:8080/jo/withdrawalLast';
 	}
 	else { //인증번호가 틀리면.
 		console.log("인증 번호가 틀렸습니다.");

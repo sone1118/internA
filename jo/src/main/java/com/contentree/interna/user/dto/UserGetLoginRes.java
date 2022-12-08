@@ -1,8 +1,5 @@
 package com.contentree.interna.user.dto;
 
-import com.contentree.interna.user.entity.Grade;
-import com.contentree.interna.user.entity.Role;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +9,7 @@ import lombok.Getter;
 @Builder
 public class UserGetLoginRes {
 	String userName;
-	Grade userGrade;
-	Role userRole;
+	String userGrade;
+	Boolean userRole;
+	Boolean userBirth;
 }

@@ -18,13 +18,14 @@
 			alt="jo_logo1!"/>		
 		</div>
 		<div>
-			<button type="button" id="login_button">
-			<img 
-				id="kakao_btn" 
-				th:src="@{/images/kakao_logo.png}" 
-				th:href="@{/kakao/oauth}"
-				alt="kakao_logo"/> 카카오 로그인
-			</button>	
+			<a th:href="@{/kakao/oauth}">
+				<button type="button" id="login_button">
+					<img 
+						id="kakao_btn" 
+						th:src="@{/images/kakao_logo.png}" 
+						alt="kakao_logo"/> 카카오 로그인
+				</button>	
+			</a>
 		</div>
 	</div>
 </html>

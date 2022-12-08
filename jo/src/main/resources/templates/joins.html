@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
@@ -15,9 +16,9 @@
 					<div class="authenticate_contents">
 						<div><h3>조인스 ID</h3></div>
 						<div>
-							<form id="email_form1" action="/api/users/send-joins">
+							<form id="email_form1" action="/jo/api/users/send-joins" method="post">
 								<div>
-									<input type="text" name="joinsId" class="input_text1" placeholder="joins id here" required/><span> &#64;joins.net</span>
+									<input type="text" id="joinsId" class="input_text1" placeholder="joins id here" required/><span> &#64;joins.net</span>
 								</div>
 								<div>
 									<button class="submit_btn" type="submit">인증번호 전송</button>
@@ -33,9 +34,9 @@
 					<div class="authenticate_contents">
 						<div><h3>인증번호</h3></div>
 						<div>
-							<form id="email_form2" action="/api/users/check-joins">
+							<form id="email_form2" action="/jo/api/users/check-joins" method="post">
 								<div>
-									<input type="number" name="certificationNumber" min="1" class="input_text2" placeholder="input number here" required/>
+									<input type="text" id="certificationCode" class="input_text2" placeholder="input certificationCode here" required/>
 								</div>
 								<div><h3 id="timer"></h3></div>
 								<div><h3 id="error_message"></h3></div>
