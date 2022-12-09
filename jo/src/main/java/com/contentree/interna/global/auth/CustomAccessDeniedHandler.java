@@ -20,18 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-    @Override
-    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
-        log.error("CustomAccessDeniedHandler - 호출 > 접근 권한 없는 유저가 접근");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//
-//        httpServletResponse.setStatus(403);
-//        httpServletResponse.setContentType("application/json;charset=utf-8");
-//        BaseResponseBody response = new BaseResponseBody(403 ,"접근 가능한 권한을 가지고 있지 않습니다.");
-//
-//        PrintWriter out = httpServletResponse.getWriter();
-//        String jsonResponse = objectMapper.writeValueAsString(response);
-//        out.print(jsonResponse);
-        httpServletResponse.sendError(400, "[AUTH_002] 접근 권한이 없습니다.");
-    }
+	@Override
+	public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+			AccessDeniedException e) throws IOException, ServletException {
+		log.error("CustomAccessDeniedHandler - 호출 > 접근 권한 없는 유저가 접근");
+		httpServletResponse.sendError(400, "[AUTH_002] 접근 권한이 없습니다.");
+	}
 }
