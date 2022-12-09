@@ -51,8 +51,6 @@ const sendEmail = (e) => {
 	e.preventDefault(); //새로고침 방지
 	
 	const joinsId = document.querySelector("#joinsId").value;
-	console.log(joinsId);
-	console.log("메일에 인증 번호를 전송합니다");	
 	
 	const emailData = {
 		method: 'POST',
@@ -63,10 +61,7 @@ const sendEmail = (e) => {
 	};
 	 fetch('/jo/api/users/send-joins', emailData)
     .then((response) => {	
-		console.log("response: ", response);
 		if(!response.ok) throw Error(); //에러던지기
-		console.log("이메일 전송에 성공했습니다.");
-		console.log("response status: ", response.status);
         
 		e.target.reset(); //input 값 전부 비우기
 		onModal2(); //인증 번호 입력창 보여주기
@@ -81,7 +76,6 @@ const sendEmail = (e) => {
 		document.querySelector("#error_message").innerText = ""; //에러 메세지가 있으면 지우기  
     })
     .catch((error) => { //메일 전송에 실패 했을 경우
-        console.log("이메일 전송에 실패했습니다. error: ", error);
         alert("이메일 전송에 실패했습니다.");
         offModal1();
     });
@@ -89,10 +83,8 @@ const sendEmail = (e) => {
 
 const sendNumber = (e) => {
 	e.preventDefault(); //새로고침 방지
-	console.log("인증번호를 보냅니다."); 
 	
 	const certificationCode = document.querySelector("#certificationCode").value;
-	console.log(certificationCode);
 	
 	const certificationCodeData = {
 		method: 'POST',
@@ -104,11 +96,7 @@ const sendNumber = (e) => {
 	
 	 fetch('/jo/api/users/check-joins', certificationCodeData)
     .then((response) => {
-		console.log(response.status);
 		if(!response.ok) throw Error(); //에러 던지기
-		
-		console.log("인증 번호가 일치합니다.");
-		console.log("response status: ", response.status);
 		
 		e.target.reset();
 		alert("인증에 성공했습니다.");
@@ -118,7 +106,6 @@ const sendNumber = (e) => {
 		window.location.href = 'http://localhost:8080/jo/';
     })
     .catch((error) => { //인증번호 인증에 실패 했을 경우.
-        console.log("인증 번호가 틀렸습니다. error: ", error);
 		document.querySelector("#error_message").innerText = "인증 번호가 틀렸습니다.";
 		e.target.reset();
 		document.querySelector(".input_text2").focus();
