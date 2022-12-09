@@ -231,7 +231,6 @@ public class UserService {
 			// redis에 있는 refresh token 삭제
 			redisUtil.deleteData(refreshToken);// key로 삭제
 
-			// cookie에 있는 refresh token 삭제 후 response에 밀어넣기
 			Cookie refreshCookie = cookieUtil.removeCookie(refreshCookieName);
 			Cookie accessCookie = cookieUtil.removeCookie(accessCookieName);
 			response.addCookie(refreshCookie);
